@@ -35,7 +35,7 @@ It's possible to use the [original HTML5 integration manual](https://sdk.poki.co
 
 When you get your PokiSDK Sitelock code, just add it to your game as:
 ```lua
-html5.run("Sitelock JS code from poki")
+html5.run("Sitelock JS code from Poki")
 ```
 For security reasons, this piece of code is not public, so please request it from your Poki contact.
 
