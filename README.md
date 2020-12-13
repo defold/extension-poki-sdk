@@ -20,7 +20,7 @@ poki_sdk.set_debug(value) -- in JS it's PokiSDK.setDebug(value)
 poki_sdk.happy_time(value) -- in JS it's PokiSDK.happyTime(value), where value is between 0 and 1
 
 -- Also, it's possible to check if AdBlock is active.
--- Updates ones when game init.
+-- The value updates ones when game init.
 poki_sdk.is_adblock_active()
 ```
 It's possible to use the [original HTML5 integration manual](https://sdk.poki.com/html5/), but this Defold SDK implements the following points from the original manual, so you can ignore them:
