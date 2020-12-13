@@ -26,8 +26,11 @@ poki_sdk.is_adblock_active()
 It's possible to use the [original HTML5 integration manual](https://sdk.poki.com/html5/), but this Defold SDK implements the following points from the original manual, so you can ignore them:
 
 >~~1. Include our Javascript SDK~~
+
 >~~2. Initialize the SDK~~
+
 >~~3. Implement gameLoadingStart and gameLoadingFinished~~
+
 >~~7. Prevent page jump~~
 
 When you get your PokiSDK Sitelock code, just add it to your game as:
