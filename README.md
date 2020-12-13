@@ -1,4 +1,4 @@
-# Poki SDK Native extension for Defold engine
+# Poki SDK native extension for Defold game engine
 
 ## Installation
 
