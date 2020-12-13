@@ -5,7 +5,11 @@ function init(self)
 
 	if html5 then
 		gui.set_text(gui.get_node("adblock"), "is_adblock_active: "..tostring(poki_sdk.is_adblock_active()))
+
+		local engine_info = sys.get_engine_info()
+		poki_sdk.set_debug(engine_info.is_debug)
 	end
+	
 end
 
 local function on_commercial_break_finished(self)
