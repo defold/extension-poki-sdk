@@ -5,7 +5,7 @@
 You can use the DefVideoAds extension in your own project by adding this project as a [Defold library dependency](http://www.defold.com/manuals/libraries/).
 Open your game.project file and in the dependencies field under project add:
 
->https://github.com/AGulev/defold-poki-sdk/archive/master.zip
+>https://github.com/AGulev/defold-poki-sdk/archive/main.zip
 
 or point to the ZIP file of a [specific release](https://github.com/AGulev/defold-poki-sdk/releases).
 
