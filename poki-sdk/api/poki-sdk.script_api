@@ -1,0 +1,59 @@
+- name: poki_sdk
+  type: table
+  desc: Functions and constants for interacting with Poki SDK APIs
+
+  members:
+
+#*****************************************************************************************************
+
+  - name: gameplay_start
+    type: function
+
+#*****************************************************************************************************
+
+  - name: gameplay_stop
+    type: function
+
+#*****************************************************************************************************
+
+  - name: commercial_break
+    type: function
+
+    parameters:
+    - name: callback
+      type: function
+
+#*****************************************************************************************************
+
+  - name: rewarded_break
+    type: function
+
+    parameters:
+    - name: callback
+      type: function
+
+#*****************************************************************************************************
+
+  - name: set_debug
+    type: function
+
+    parameters:
+    - name: is_debug
+      type: boolean
+
+#*****************************************************************************************************
+
+  - name: happy_time
+    type: function
+
+    parameters:
+    - name: value
+      type: number
+
+#*****************************************************************************************************
+
+  - name: is_adblock_active
+    type: function
+
+#*****************************************************************************************************
+      
