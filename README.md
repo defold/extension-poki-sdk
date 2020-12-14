@@ -1,5 +1,5 @@
 # Poki SDK native extension for Defold game engine
-
+![pokisdk-hero](https://user-images.githubusercontent.com/2209596/102117637-db1df480-3e3e-11eb-9822-db237f36c0f6.jpg)
 ## Installation
 
 You can use the Poki SDK extension in your own project by adding this project as a [Defold library dependency](http://www.defold.com/manuals/libraries/).
