@@ -6,19 +6,21 @@ function init(self)
 	if html5 then
 		gui.set_text(gui.get_node("adblock"), "is_adblock_active: "..tostring(poki_sdk.is_adblock_active()))
 
-		local engine_info = sys.get_engine_info()
-		poki_sdk.set_debug(engine_info.is_debug)
+		-- local engine_info = sys.get_engine_info()
+		-- poki_sdk.set_debug(engine_info.is_debug)
 	end
 	
 end
 
 local function on_commercial_break_finished(self)
 	-- continue game
-	print("continue game")
+	print("Comercial finished")
+	gui.set_text(gui.get_node("success"), "Comercial finished")
 end
 
 local function on_rewarded_break_finished(self, success)
-	gui.set_text(gui.get_node("success"), "success: "..tostring(success))
+	print("Rewarded success: "..tostring(success))
+	gui.set_text(gui.get_node("success"), "Rewarded success: "..tostring(success))
 end
 
 function on_input(self, action_id, action)
@@ -32,10 +34,12 @@ function on_input(self, action_id, action)
 		end)
 
 		dirtylarry:button("commercial", action_id, action, function ()
+			print("Click Show commercial")
 			poki_sdk.commercial_break(on_commercial_break_finished)
 		end)
 
 		dirtylarry:button("reward", action_id, action, function ()
+			print("Click Show reward")
 			poki_sdk.rewarded_break(on_rewarded_break_finished)
 		end)
 

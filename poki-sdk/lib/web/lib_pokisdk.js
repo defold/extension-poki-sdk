@@ -7,12 +7,12 @@ var LibPokiSdk = {
         _callback: null,
 
         _commercialBreakCallback: function() {
-            dynCall("v", PokiSdk._callback);
+            {{{ makeDynCall("v", "PokiSdk._callback")}}}();
         },
 
         _rewardedBreakCallback: function(success) {
             var msg = success ? 1 : 0; 
-            dynCall("vi", PokiSdk._callback, [msg]);
+            {{{ makeDynCall("vi", "PokiSdk._callback")}}}(msg);
         }
     },
 
