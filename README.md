@@ -33,6 +33,8 @@ It's possible to use the [original HTML5 integration manual](https://sdk.poki.co
 
 >~~7. Prevent page jump~~
 
+Make sure you pause sounds and music when show ADS.
+
 When you get your PokiSDK Sitelock code, just add it to your game as:
 ```lua
 html5.run("Sitelock JS code from Poki")

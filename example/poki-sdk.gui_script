@@ -9,17 +9,19 @@ function init(self)
 		-- local engine_info = sys.get_engine_info()
 		-- poki_sdk.set_debug(engine_info.is_debug)
 	end
-	
+	sound.play("#sound")
 end
 
 local function on_commercial_break_finished(self)
 	-- continue game
 	print("Comercial finished")
+	sound.pause("#sound", false)
 	gui.set_text(gui.get_node("success"), "Comercial finished")
 end
 
 local function on_rewarded_break_finished(self, success)
 	print("Rewarded success: "..tostring(success))
+	sound.pause("#sound", false)
 	gui.set_text(gui.get_node("success"), "Rewarded success: "..tostring(success))
 end
 
@@ -35,11 +37,13 @@ function on_input(self, action_id, action)
 
 		dirtylarry:button("commercial", action_id, action, function ()
 			print("Click Show commercial")
+			sound.pause("#sound", true)
 			poki_sdk.commercial_break(on_commercial_break_finished)
 		end)
 
 		dirtylarry:button("reward", action_id, action, function ()
 			print("Click Show reward")
+			sound.pause("#sound", true)
 			poki_sdk.rewarded_break(on_rewarded_break_finished)
 		end)
 
