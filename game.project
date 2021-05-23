@@ -10,11 +10,13 @@ height = 640
 
 [project]
 title = Defold Poki SDK
-dependencies = https://github.com/andsve/dirtylarry/archive/master.zip
+dependencies#0 = https://github.com/andsve/dirtylarry/archive/master.zip
 
 [library]
 include_dirs = poki-sdk
 
 [html5]
 heap_size = 32
+show_fullscreen_button = 0
+show_made_with_defold = 0
 
