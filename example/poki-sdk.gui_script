@@ -25,30 +25,50 @@ local function on_rewarded_break_finished(self, success)
 	gui.set_text(gui.get_node("success"), "Rewarded success: "..tostring(success))
 end
 
+local function on_shareable_url_ready(self, url)
+	print("Sharable url: "..url)
+	gui.set_text(gui.get_node("url"), url)
+end
+
 function on_input(self, action_id, action)
 	if html5 then
-		dirtylarry:button("start", action_id, action, function ()
+		dirtylarry:button("start", action_id, action, function()
 			poki_sdk.gameplay_start()
 		end)
 
-		dirtylarry:button("stop", action_id, action, function ()
+		dirtylarry:button("stop", action_id, action, function()
 			poki_sdk.gameplay_stop()
 		end)
 
-		dirtylarry:button("commercial", action_id, action, function ()
+		dirtylarry:button("commercial", action_id, action, function()
 			print("Click Show commercial")
 			sound.pause("#sound", true)
 			poki_sdk.commercial_break(on_commercial_break_finished)
 		end)
 
-		dirtylarry:button("reward", action_id, action, function ()
+		dirtylarry:button("reward", action_id, action, function()
 			print("Click Show reward")
 			sound.pause("#sound", true)
 			poki_sdk.rewarded_break(on_rewarded_break_finished)
 		end)
 
-		dirtylarry:button("happy", action_id, action, function ()
+		dirtylarry:button("happy", action_id, action, function()
 			poki_sdk.happy_time(math.random(1, 10)/10) -- between 0 and 1
 		end)
+
+		dirtylarry:button("shareable_url", action_id, action, function()
+			poki_sdk.shareable_url({param1 = 123, param2 = "str2"}, on_shareable_url_ready)
+		end)
+
+		dirtylarry:button("get_url_param", action_id, action, function()
+			local str = "param1:"
+			local param1 = poki_sdk.get_url_param("param1")
+			local param2 = poki_sdk.get_url_param("param2")
+			print("param1:"..tostring(param1).."\nparam2:"..tostring(param2))
+			str = str..tostring(param1).."\n"
+			str = "param2:"..str..tostring(param2)
+			gui.set_text(gui.get_node("params"), str)
+		end)
+		
 	end
 end

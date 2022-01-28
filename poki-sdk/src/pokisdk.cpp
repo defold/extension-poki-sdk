@@ -6,8 +6,16 @@
 
 #if defined(DM_PLATFORM_HTML5)
 
+enum PokiCallbackType
+{
+    TYPE_INTERSTITIAL,
+    TYPE_REWARDED,
+    TYPE_SHARABLE_URL
+};
+
 typedef void (*CommercialBreakCallback)();
 typedef void (*RewardedBreakCallback)(int success);
+typedef void (*ShareableURLCallback)(const char* url, int url_length);
 
 extern "C" {
     void PokiSdkJs_GameplayStart();
@@ -19,9 +27,13 @@ extern "C" {
     void PokiSdkJs_HappyTime(float value);
 
     int PokiSdkJs_IsAdBlock();
+
+    void PokiSdkJs_AddParameterForURL(const char* key, const char* value);
+    void PokiSdkJs_ShareableURL(ShareableURLCallback callback);
+    const char* PokiSdkJs_GetURLParam(const char* key);
 }
 
-static dmScript::LuaCallbackInfo* pokiSdk_AdsCallback = 0x0;
+static dmScript::LuaCallbackInfo* pokiSdk_Callback = 0x0;
 
 static bool PokiSdk_luaL_checkbool(lua_State *L, int numArg)
 {
@@ -37,49 +49,62 @@ static bool PokiSdk_luaL_checkbool(lua_State *L, int numArg)
     return b;
 }
 
-static void PokiSdk_InvokeCallback(int numOfArgs, int success)
+static void PokiSdk_InvokeCallback(PokiCallbackType callbackType, int intArg, const char* charArg)
 {
-    if (!dmScript::IsCallbackValid(pokiSdk_AdsCallback))
+    if (!dmScript::IsCallbackValid(pokiSdk_Callback))
     {
         dmLogError("PokiSDK callback is invalid. Use callback function as an argument when show ADS.");
         return;
     }
 
-    lua_State* L = dmScript::GetCallbackLuaContext(pokiSdk_AdsCallback);
+    lua_State* L = dmScript::GetCallbackLuaContext(pokiSdk_Callback);
 
     DM_LUA_STACK_CHECK(L, 0);
 
-    if (!dmScript::SetupCallback(pokiSdk_AdsCallback))
+    if (!dmScript::SetupCallback(pokiSdk_Callback))
     {
         return;
     }
 
-    if (numOfArgs == 1)
+    int numOfArgs = 0;
+
+    if (callbackType == TYPE_REWARDED)
     {
-        lua_pushboolean(L, success);
+        lua_pushboolean(L, intArg);
+        numOfArgs = 1;
+    }
+    else if (callbackType == TYPE_SHARABLE_URL)
+    {
+        lua_pushlstring(L, charArg, intArg);
+        numOfArgs = 1;
     }
     numOfArgs += 1;
 
     int ret = dmScript::PCall(L, numOfArgs, 0);
     (void)ret;
 
-    dmScript::TeardownCallback(pokiSdk_AdsCallback);
+    dmScript::TeardownCallback(pokiSdk_Callback);
 
-    if (pokiSdk_AdsCallback != 0x0)
+    if (pokiSdk_Callback != 0x0)
     {
-        dmScript::DestroyCallback(pokiSdk_AdsCallback);
-        pokiSdk_AdsCallback = 0x0;
+        dmScript::DestroyCallback(pokiSdk_Callback);
+        pokiSdk_Callback = 0x0;
     }
 }
 
 static void PokiSdk_CommercialBreakCallback()
 {
-    PokiSdk_InvokeCallback(0, 0);
+    PokiSdk_InvokeCallback(TYPE_INTERSTITIAL, 0, 0);
 }
 
 static void PokiSdk_RewardedBreakCallback(int success)
 {
-    PokiSdk_InvokeCallback(1, success);
+    PokiSdk_InvokeCallback(TYPE_REWARDED, success, 0);
+}
+
+static void PokiSdk_ShareableURLCallback(const char* url, int url_length)
+{
+    PokiSdk_InvokeCallback(TYPE_SHARABLE_URL, url_length, url);
 }
 
 static int PokiSdk_GameplayStart(lua_State* L)
@@ -100,11 +125,11 @@ static int PokiSdk_CommercialBreak(lua_State* L)
 {
     int type = lua_type(L, 1);
     if (type != LUA_TFUNCTION) {
-        dmLogError("PokiSDK callback is invalid. Use callback function as an argument when show ADS.");
+        luaL_error(L, "PokiSDK callback is invalid. Use callback function as an argument when show ADS.");
         return 0;
     }
     DM_LUA_STACK_CHECK(L, 0);
-    pokiSdk_AdsCallback = dmScript::CreateCallback(L, 1);
+    pokiSdk_Callback = dmScript::CreateCallback(L, 1);
     PokiSdkJs_CommercialBreak((CommercialBreakCallback)PokiSdk_CommercialBreakCallback);
     return 0;
 }
@@ -113,11 +138,11 @@ static int PokiSdk_RewardedBreak(lua_State* L)
 {
     int type = lua_type(L, 1);
     if (type != LUA_TFUNCTION) {
-        dmLogError("PokiSDK callback is invalid. Use callback function as an argument when show ADS.");
+        luaL_error(L, "PokiSDK callback is invalid. Use callback function as an argument when show ADS.");
         return 0;
     }
     DM_LUA_STACK_CHECK(L, 0);
-    pokiSdk_AdsCallback = dmScript::CreateCallback(L, 1);
+    pokiSdk_Callback = dmScript::CreateCallback(L, 1);
     PokiSdkJs_RewardedBreak((RewardedBreakCallback)PokiSdk_RewardedBreakCallback);
     return 0;
 }
@@ -146,6 +171,53 @@ static int PokiSdk_IsAdBlock(lua_State* L)
     return 1;
 }
 
+static int PokiSdk_ShareableURL(lua_State* L)
+{
+    int type = lua_type(L, 1);
+    if (lua_type(L, 1) != LUA_TTABLE)
+    {
+        luaL_error(L, "Invalid parameters table. Use table with key:value pairs.");
+        return 0;
+    }
+    lua_pushvalue(L, 1);
+    lua_pushnil(L);
+    while (lua_next(L, -2) != 0)
+    {
+        const char* key = luaL_checkstring(L, -2);
+        const char* value = luaL_checkstring(L, -1);
+        PokiSdkJs_AddParameterForURL(key, value);
+        lua_pop(L, 1);
+    }
+    lua_pop(L, 1);
+    
+    type = lua_type(L, 2);
+    if (type != LUA_TFUNCTION)
+    {
+        luaL_error(L, "PokiSDK callback is invalid. The second argument should be a callback function.");
+        return 0;
+    }
+    DM_LUA_STACK_CHECK(L, 0);
+    pokiSdk_Callback = dmScript::CreateCallback(L, 2);
+    PokiSdkJs_ShareableURL((ShareableURLCallback)PokiSdk_ShareableURLCallback);
+    return 0;
+}
+
+static int PokiSdk_GetURLParam(lua_State* L)
+{
+    DM_LUA_STACK_CHECK(L, 1);
+    const char* key = luaL_checkstring(L, 1);
+    const char* value = PokiSdkJs_GetURLParam(key);
+    if (value)
+    {
+        lua_pushstring(L, value);
+    }
+    else
+    {
+        lua_pushnil(L);
+    }
+    return 1;
+}
+
 // Functions exposed to Lua
 static const luaL_reg Module_methods[] =
 {
@@ -156,6 +228,8 @@ static const luaL_reg Module_methods[] =
     {"happy_time", PokiSdk_HappyTime},
     {"set_debug", PokiSdk_SetDebug},
     {"is_adblock_active", PokiSdk_IsAdBlock},
+    {"shareable_url", PokiSdk_ShareableURL},
+    {"get_url_param", PokiSdk_GetURLParam},
     {0, 0}
 };
 
@@ -172,13 +246,11 @@ static void LuaInit(lua_State* L)
 dmExtension::Result InitializePokiSdk(dmExtension::Params* params)
 {
     LuaInit(params->m_L);
-    dmLogInfo("Registered %s Extension\n", MODULE_NAME);
     return dmExtension::RESULT_OK;
 }
 
 dmExtension::Result FinalizePokiSdk(dmExtension::Params* params)
 {
-    dmLogInfo("Finalize %s Extension\n", MODULE_NAME);
     return dmExtension::RESULT_OK;
 }
 

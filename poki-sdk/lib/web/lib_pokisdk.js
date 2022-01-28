@@ -5,6 +5,8 @@ var LibPokiSdk = {
     $PokiSdk: {
 
         _callback: null,
+        _urlCallback: null,
+        _urlParameters:null,
 
         _commercialBreakCallback: function() {
             {{{ makeDynCall("v", "PokiSdk._callback")}}}();
@@ -13,6 +15,13 @@ var LibPokiSdk = {
         _rewardedBreakCallback: function(success) {
             var msg = success ? 1 : 0; 
             {{{ makeDynCall("vi", "PokiSdk._callback")}}}(msg);
+        },
+
+        _shareableURLCallback: function(url) {
+            var url_arr = intArrayFromString(url, true);
+            var _url = allocate(url_arr, ALLOC_NORMAL);        
+            {{{ makeDynCall("vii", "PokiSdk._urlCallback")}}}(_url, url_arr.length);
+            Module._free(_url);
         }
     },
 
@@ -45,6 +54,25 @@ var LibPokiSdk = {
     PokiSdkJs_IsAdBlock: function() {
         return Module.PokiSDK_isAdBlock;
     },
+
+    PokiSdkJs_AddParameterForURL: function(key, value) {
+        if (PokiSdk._urlParameters == null) {
+            PokiSdk._urlParameters = {};
+        }
+        PokiSdk._urlParameters[UTF8ToString(key)] = UTF8ToString(value);
+    },
+
+    PokiSdkJs_ShareableURL: function(callback) {
+        PokiSdk._urlCallback = callback;
+        PokiSDK.shareableURL(PokiSdk._urlParameters).then(PokiSdk._shareableURLCallback);
+        PokiSdk._urlParameters = null;
+    },
+
+    PokiSdkJs_GetURLParam: function(key) {
+        var key = UTF8ToString(key);
+        var value = PokiSDK.getURLParam(key);
+        return allocate(intArrayFromString(value), ALLOC_STACK);
+    }
 }
 
 autoAddDeps(LibPokiSdk, '$PokiSdk');
