@@ -19,7 +19,7 @@ poki_sdk.rewarded_break(function(self, success)end) -- in JS it's PokiSDK.reward
 poki_sdk.set_debug(value) -- in JS it's PokiSDK.setDebug(value)
 poki_sdk.happy_time(value) -- in JS it's PokiSDK.happyTime(value), where value is between 0 and 1
 poki_sdk.shareable_url(params, callback) -- in JS it's PokiSDK.shareableURL({}).then(url => {})
-loacal value = poki_sdk.get_url_param(key) -- in JS it's PokiSDK.getURLParam('id')
+local value = poki_sdk.get_url_param(key) -- in JS it's PokiSDK.getURLParam('id')
 
 -- Also, it's possible to check if AdBlock is active.
 -- The value updates ones when game init.
