@@ -1253,7 +1253,7 @@ nodes {
     w: 1.0
   }
   adjust_mode: ADJUST_MODE_FIT
-  line_break: false
+  line_break: true
   layer: ""
   inherit_alpha: true
   alpha: 1.0
