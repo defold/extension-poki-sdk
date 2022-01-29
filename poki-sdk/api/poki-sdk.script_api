@@ -49,6 +49,31 @@
     parameters:
     - name: value
       type: number
+      
+#*****************************************************************************************************
+
+  - name: shareable_url
+    type: function
+
+    parameters:
+    - name: params
+      type: table
+    
+    - name: callback
+      type: function
+      
+#*****************************************************************************************************
+
+  - name: get_url_param
+    type: function
+    
+    parameters:
+    - name: key
+      type: string
+    
+    return:
+    - name: value
+      type: string
 
 #*****************************************************************************************************
 
