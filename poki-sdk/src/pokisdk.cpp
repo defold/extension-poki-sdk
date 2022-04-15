@@ -21,6 +21,7 @@ extern "C" {
     void PokiSdkJs_GameplayStart();
     void PokiSdkJs_GameplayStop();
     void PokiSdkJs_SetDebug(bool value);
+    void PokiSdkJs_CaptureError(const char* error);
 
     void PokiSdkJs_CommercialBreak(CommercialBreakCallback callback);
     void PokiSdkJs_RewardedBreak(RewardedBreakCallback callback);
@@ -154,6 +155,14 @@ static int PokiSdk_SetDebug(lua_State* L)
     return 0;
 }
 
+static int PokiSdk_CaptureError(lua_State* L)
+{
+    DM_LUA_STACK_CHECK(L, 0);
+    const char* error = luaL_checkstring(L, 1);
+    PokiSdkJs_CaptureError(error);
+    return 0;
+}
+
 static int PokiSdk_IsAdBlocked(lua_State* L)
 {
     DM_LUA_STACK_CHECK(L, 1);
@@ -217,6 +226,7 @@ static const luaL_reg Module_methods[] =
     {"commercial_break", PokiSdk_CommercialBreak},
     {"rewarded_break", PokiSdk_RewardedBreak},
     {"set_debug", PokiSdk_SetDebug},
+    {"capture_error", PokiSdk_CaptureError},
     {"is_ad_blocked", PokiSdk_IsAdBlocked},
     {"shareable_url", PokiSdk_ShareableURL},
     {"get_url_param", PokiSdk_GetURLParam},

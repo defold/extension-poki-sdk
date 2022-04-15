@@ -47,6 +47,10 @@ var LibPokiSdk = {
         PokiSDK.setDebug(value); 
     },
 
+    PokiSdkJs_CaptureError: function(error) {
+        PokiSDK.captureError(UTF8ToString(error));
+    },
+
     PokiSdkJs_IsAdBlocked: function() {
         return PokiSDK.isAdBlocked();
     },
