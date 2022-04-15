@@ -47,10 +47,6 @@ var LibPokiSdk = {
         PokiSDK.setDebug(value); 
     },
 
-    PokiSdkJs_HappyTime: function(value) {
-        PokiSDK.happyTime(value);
-    },
-
     PokiSdkJs_IsAdBlock: function() {
         return Module.PokiSDK_isAdBlock;
     },

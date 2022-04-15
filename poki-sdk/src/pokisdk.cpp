@@ -24,7 +24,6 @@ extern "C" {
 
     void PokiSdkJs_CommercialBreak(CommercialBreakCallback callback);
     void PokiSdkJs_RewardedBreak(RewardedBreakCallback callback);
-    void PokiSdkJs_HappyTime(float value);
 
     int PokiSdkJs_IsAdBlock();
 
@@ -147,14 +146,6 @@ static int PokiSdk_RewardedBreak(lua_State* L)
     return 0;
 }
 
-static int PokiSdk_HappyTime(lua_State* L)
-{
-    DM_LUA_STACK_CHECK(L, 0);
-    float value = luaL_checknumber(L, 1);
-    PokiSdkJs_HappyTime(value);
-    return 0;
-}
-
 static int PokiSdk_SetDebug(lua_State* L)
 {
     DM_LUA_STACK_CHECK(L, 0);
@@ -225,7 +216,6 @@ static const luaL_reg Module_methods[] =
     {"gameplay_stop", PokiSdk_GameplayStop},
     {"commercial_break", PokiSdk_CommercialBreak},
     {"rewarded_break", PokiSdk_RewardedBreak},
-    {"happy_time", PokiSdk_HappyTime},
     {"set_debug", PokiSdk_SetDebug},
     {"is_adblock_active", PokiSdk_IsAdBlock},
     {"shareable_url", PokiSdk_ShareableURL},
