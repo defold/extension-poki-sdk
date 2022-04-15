@@ -22,7 +22,7 @@ local value = poki_sdk.get_url_param(key) -- in JS it's PokiSDK.getURLParam('id'
 
 -- Also, it's possible to check if AdBlock is active.
 -- The value updates ones when game init.
-poki_sdk.is_adblock_active()
+poki_sdk.is_ad_blocked()
 ```
 It's possible to use the [original HTML5 integration manual](https://sdk.poki.com/html5/), but this Defold SDK implements the following points from the original manual, so you can ignore them:
 

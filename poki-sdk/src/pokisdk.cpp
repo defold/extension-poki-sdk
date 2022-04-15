@@ -25,7 +25,7 @@ extern "C" {
     void PokiSdkJs_CommercialBreak(CommercialBreakCallback callback);
     void PokiSdkJs_RewardedBreak(RewardedBreakCallback callback);
 
-    int PokiSdkJs_IsAdBlock();
+    int PokiSdkJs_IsAdBlocked();
 
     void PokiSdkJs_AddParameterForURL(const char* key, const char* value);
     void PokiSdkJs_ShareableURL(ShareableURLCallback callback);
@@ -154,11 +154,11 @@ static int PokiSdk_SetDebug(lua_State* L)
     return 0;
 }
 
-static int PokiSdk_IsAdBlock(lua_State* L)
+static int PokiSdk_IsAdBlocked(lua_State* L)
 {
     DM_LUA_STACK_CHECK(L, 1);
-    int isAdBlock = PokiSdkJs_IsAdBlock();
-    lua_pushboolean(L, isAdBlock);
+    int isAdBlocked = PokiSdkJs_IsAdBlocked();
+    lua_pushboolean(L, isAdBlocked);
     return 1;
 }
 
@@ -217,7 +217,7 @@ static const luaL_reg Module_methods[] =
     {"commercial_break", PokiSdk_CommercialBreak},
     {"rewarded_break", PokiSdk_RewardedBreak},
     {"set_debug", PokiSdk_SetDebug},
-    {"is_adblock_active", PokiSdk_IsAdBlock},
+    {"is_ad_blocked", PokiSdk_IsAdBlocked},
     {"shareable_url", PokiSdk_ShareableURL},
     {"get_url_param", PokiSdk_GetURLParam},
     {0, 0}

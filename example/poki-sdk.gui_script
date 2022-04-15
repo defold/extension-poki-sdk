@@ -4,7 +4,7 @@ function init(self)
 	msg.post(".", "acquire_input_focus")
 
 	if html5 then
-		gui.set_text(gui.get_node("adblock"), "is_adblock_active: "..tostring(poki_sdk.is_adblock_active()))
+		gui.set_text(gui.get_node("adblock"), "is_ad_blocked: "..tostring(poki_sdk.is_ad_blocked()))
 
 		-- local engine_info = sys.get_engine_info()
 		-- poki_sdk.set_debug(engine_info.is_debug)

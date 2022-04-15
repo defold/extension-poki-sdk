@@ -47,8 +47,8 @@ var LibPokiSdk = {
         PokiSDK.setDebug(value); 
     },
 
-    PokiSdkJs_IsAdBlock: function() {
-        return Module.PokiSDK_isAdBlock;
+    PokiSdkJs_IsAdBlocked: function() {
+        return PokiSDK.isAdBlocked();
     },
 
     PokiSdkJs_AddParameterForURL: function(key, value) {

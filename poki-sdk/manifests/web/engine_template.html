@@ -19,10 +19,8 @@
 		});
 		Module['onRuntimeInitialized'] = function() {
 			PokiSDK.init().then(()=>{
-				Module.PokiSDK_isAdBlock = 0;
 				Module.runApp("canvas", extra_params);
 			}).catch(()=>{
-				Module.PokiSDK_isAdBlock = 1;
 				Module.runApp("canvas", extra_params);
 			});
 		};
