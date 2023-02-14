@@ -1,15 +1,11 @@
 # Poki SDK native extension for Defold game engine
 ![pokisdk-hero](https://user-images.githubusercontent.com/2209596/102117637-db1df480-3e3e-11eb-9822-db237f36c0f6.jpg)
 ## Installation
+To use this library in your Defold project, add the needed version URL to your `game.project` dependencies from [Releases](https://github.com/defold/defold-poki-sdk/releases)
 
-You can use the Poki SDK extension in your own project by adding this project as a [Defold library dependency](http://www.defold.com/manuals/libraries/).
-Open your game.project file and in the dependencies field under project add:
+<img width="401" alt="image" src="https://user-images.githubusercontent.com/2209596/202223571-c77f0304-5202-4314-869d-7a90bbeec5ec.png">
 
->https://github.com/AGulev/defold-poki-sdk/archive/main.zip
-
-or point to the ZIP file of a [specific release](https://github.com/AGulev/defold-poki-sdk/releases).
-
-Lua API corresponds to original JS API SDK:
+##Lua API corresponds to original JS API SDK:
 
 ```lua
 poki_sdk.gameplay_start() -- in JS it's PokiSDK.gameplayStart()
