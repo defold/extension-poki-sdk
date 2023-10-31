@@ -1,20 +1,5 @@
 local dirtylarry = require "dirtylarry/dirtylarry"
 
-local function setup_error_handling()
-	if not poki_sdk then
-		return
-	end
-
-	sys.set_error_handler(function(source, message, traceback)
-		-- Concatenate all args to make the error string like that:
-		-- lua: example/poki-sdk.gui_script:86: attempt to index global 'dsf' (a nil value)
-		-- stack traceback:
-		-- [C]:-1: in function set_position
-		--     example/poki-sdk.gui_script:31: in function <example/poki-sdk.gui_script:18>
-		poki_sdk.capture_error(source .. ": " .. message .. "\n" .. traceback)
-	end)
-end
-
 function init(self)
 	msg.post(".", "acquire_input_focus")
 
@@ -25,8 +10,6 @@ function init(self)
 		-- poki_sdk.set_debug(engine_info.is_debug)
 	end
 	sound.play("#sound")
-	
-	setup_error_handling()
 end
 
 local function on_commercial_break_finished(self)
