@@ -23,17 +23,9 @@ local value = poki_sdk.get_url_param(key) -- in JS it's PokiSDK.getURLParam('id'
 -- Also, it's possible to check if AdBlock is active.
 poki_sdk.is_ad_blocked()
 ```
-It's possible to use the [original HTML5 integration manual](https://sdk.poki.com/html5/), but this Defold SDK implements the following points from the original manual, so you can ignore them:
+Use this instruction: [PokiSDK - Defold](https://sdk.poki.com/defold.html)
 
->~~1. Include our Javascript SDK~~
-
->~~2. Initialize the SDK~~
-
->~~3. Implement gameLoadingStart and gameLoadingFinished~~
-
->~~7. Prevent page jump~~
-
-Make sure you pause sounds and music when show ADS.
+Do not collect Lua errors manually using `sys.set_error_handler()``. The SDK collects Lua errors and the engine's errors and warnings automatically.
 
 When you get your PokiSDK Sitelock code, just add it to your game as:
 ```lua
