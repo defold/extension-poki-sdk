@@ -22,6 +22,7 @@ extern "C" {
     void PokiSdkJs_GameplayStop();
     void PokiSdkJs_SetDebug(bool value);
     void PokiSdkJs_CaptureError(const char* error);
+    void PokiSdkJs_InternalCaptureError(const char* formatted_string);
 
     void PokiSdkJs_CommercialBreak(CommercialBreakCallback callback);
     void PokiSdkJs_RewardedBreak(RewardedBreakCallback callback);
@@ -243,29 +244,71 @@ static void LuaInit(lua_State* L)
     assert(top == lua_gettop(L));
 }
 
-dmExtension::Result InitializePokiSdk(dmExtension::Params* params)
+static dmExtension::Result InitializePokiSdk(dmExtension::Params* params)
 {
     LuaInit(params->m_L);
     return dmExtension::RESULT_OK;
 }
 
-dmExtension::Result FinalizePokiSdk(dmExtension::Params* params)
+static dmExtension::Result FinalizePokiSdk(dmExtension::Params* params)
 {
+    return dmExtension::RESULT_OK;
+}
+
+static void LogListener(LogSeverity severity, const char* domain, const char* formatted_string)
+{
+    switch (severity)
+    {
+        case LOG_SEVERITY_WARNING:
+        case LOG_SEVERITY_ERROR:
+        case LOG_SEVERITY_FATAL:
+            PokiSdkJs_InternalCaptureError(formatted_string);
+        break;
+        case LOG_SEVERITY_DEBUG:
+        case LOG_SEVERITY_USER_DEBUG:
+        case LOG_SEVERITY_INFO:
+        // do nothing
+        break;
+        default:
+        // do nothing
+        break;
+    }
+}
+
+static dmExtension::Result AppInitializePokiSdk(dmExtension::AppParams *params)
+{
+    dmLogRegisterListener(&LogListener);
+    return dmExtension::RESULT_OK;
+}
+
+static dmExtension::Result AppFinalizePokiSdk(dmExtension::AppParams *params)
+{
+    dmLogUnregisterListener(&LogListener);
     return dmExtension::RESULT_OK;
 }
 
 #else // unsupported platforms
 
-dmExtension::Result InitializePokiSdk(dmExtension::Params* params)
+static dmExtension::Result InitializePokiSdk(dmExtension::Params* params)
 {
     return dmExtension::RESULT_OK;
 }
 
-dmExtension::Result FinalizePokiSdk(dmExtension::Params* params)
+static dmExtension::Result FinalizePokiSdk(dmExtension::Params* params)
+{
+    return dmExtension::RESULT_OK;
+}
+
+static dmExtension::Result AppInitializePokiSdk(dmExtension::AppParams *params)
+{
+    return dmExtension::RESULT_OK;
+}
+
+static dmExtension::Result AppFinalizePokiSdk(dmExtension::AppParams *params)
 {
     return dmExtension::RESULT_OK;
 }
 
 #endif
 
-DM_DECLARE_EXTENSION(EXTENSION_NAME, LIB_NAME, 0, 0, InitializePokiSdk, 0, 0, FinalizePokiSdk)
+DM_DECLARE_EXTENSION(EXTENSION_NAME, LIB_NAME, AppInitializePokiSdk, AppFinalizePokiSdk, InitializePokiSdk, 0, 0, FinalizePokiSdk)

@@ -51,6 +51,12 @@ var LibPokiSdk = {
         PokiSDK.captureError(UTF8ToString(error));
     },
 
+    PokiSdkJs_InternalCaptureError: function(formatted_string) {
+        var js_formatted_string = UTF8ToString(formatted_string);
+        var final_message = "DEFOLD:" + js_formatted_string;
+        PokiSDK.captureError(final_message);
+    },
+
     PokiSdkJs_IsAdBlocked: function() {
         return PokiSDK.isAdBlocked();
     },

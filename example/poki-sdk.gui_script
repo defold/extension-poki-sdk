@@ -85,6 +85,13 @@ function on_input(self, action_id, action)
 			print("Click lua-error")
 			print(dsf.frt)
 		end)
+
+		dirtylarry:button("engine-error", action_id, action, function()
+			print("Click engine-error")
+			for i = 1, 12 do
+				gui.new_box_node(vmath.vector3(-1), vmath.vector3(1))
+			end
+		end)
 		
 	end
 end

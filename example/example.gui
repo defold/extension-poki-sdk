@@ -52,6 +52,7 @@ nodes {
   template: "/dirtylarry/button.gui"
   template_node_child: false
   custom_type: 0
+  enabled: true
 }
 nodes {
   position {
@@ -108,6 +109,9 @@ nodes {
   template_node_child: true
   size_mode: SIZE_MODE_MANUAL
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -173,11 +177,14 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
     x: 176.0
-    y: 270.0
+    y: 294.0
     z: 0.0
     w: 1.0
   }
@@ -213,6 +220,7 @@ nodes {
   template: "/dirtylarry/button.gui"
   template_node_child: false
   custom_type: 0
+  enabled: true
 }
 nodes {
   position {
@@ -269,6 +277,9 @@ nodes {
   template_node_child: true
   size_mode: SIZE_MODE_MANUAL
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -334,6 +345,9 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -374,6 +388,7 @@ nodes {
   template: "/dirtylarry/button.gui"
   template_node_child: false
   custom_type: 0
+  enabled: true
 }
 nodes {
   position {
@@ -430,6 +445,9 @@ nodes {
   template_node_child: true
   size_mode: SIZE_MODE_MANUAL
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -495,11 +513,14 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
     x: 490.0
-    y: 265.0
+    y: 289.0
     z: 0.0
     w: 1.0
   }
@@ -535,6 +556,7 @@ nodes {
   template: "/dirtylarry/button.gui"
   template_node_child: false
   custom_type: 0
+  enabled: true
 }
 nodes {
   position {
@@ -591,6 +613,9 @@ nodes {
   template_node_child: true
   size_mode: SIZE_MODE_MANUAL
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -656,6 +681,9 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -719,6 +747,9 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -782,6 +813,9 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -804,7 +838,7 @@ nodes {
   }
   size {
     x: 200.0
-    y: 236.0
+    y: 100.0
     z: 0.0
     w: 1.0
   }
@@ -837,6 +871,9 @@ nodes {
   template_node_child: false
   size_mode: SIZE_MODE_AUTO
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -900,6 +937,9 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -940,6 +980,7 @@ nodes {
   template: "/dirtylarry/button.gui"
   template_node_child: false
   custom_type: 0
+  enabled: true
 }
 nodes {
   position {
@@ -996,6 +1037,9 @@ nodes {
   template_node_child: true
   size_mode: SIZE_MODE_MANUAL
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -1061,6 +1105,9 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -1124,11 +1171,14 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
     x: 801.0
-    y: 265.0
+    y: 289.0
     z: 0.0
     w: 1.0
   }
@@ -1164,6 +1214,7 @@ nodes {
   template: "/dirtylarry/button.gui"
   template_node_child: false
   custom_type: 0
+  enabled: true
 }
 nodes {
   position {
@@ -1220,6 +1271,9 @@ nodes {
   template_node_child: true
   size_mode: SIZE_MODE_MANUAL
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -1286,6 +1340,9 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -1349,11 +1406,14 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
     x: 176.0
-    y: 143.0
+    y: 179.0
     z: 0.0
     w: 1.0
   }
@@ -1389,6 +1449,7 @@ nodes {
   template: "/dirtylarry/button.gui"
   template_node_child: false
   custom_type: 0
+  enabled: true
 }
 nodes {
   position {
@@ -1445,6 +1506,9 @@ nodes {
   template_node_child: true
   size_mode: SIZE_MODE_MANUAL
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 nodes {
   position {
@@ -1510,7 +1574,178 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
   custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
+}
+nodes {
+  position {
+    x: 176.0
+    y: 67.0
+    z: 0.0
+    w: 1.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+    z: 0.0
+    w: 1.0
+  }
+  color {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  type: TYPE_TEMPLATE
+  id: "engine-error"
+  layer: ""
+  inherit_alpha: true
+  alpha: 1.0
+  template: "/dirtylarry/button.gui"
+  template_node_child: false
+  custom_type: 0
+  enabled: true
+}
+nodes {
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  size {
+    x: 300.0
+    y: 88.0
+    z: 0.0
+    w: 1.0
+  }
+  color {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  type: TYPE_BOX
+  blend_mode: BLEND_MODE_ALPHA
+  texture: "button/button_normal"
+  id: "engine-error/larrybutton"
+  xanchor: XANCHOR_NONE
+  yanchor: YANCHOR_NONE
+  pivot: PIVOT_CENTER
+  adjust_mode: ADJUST_MODE_FIT
+  parent: "engine-error"
+  layer: ""
+  inherit_alpha: true
+  slice9 {
+    x: 32.0
+    y: 32.0
+    z: 32.0
+    w: 32.0
+  }
+  clipping_mode: CLIPPING_MODE_NONE
+  clipping_visible: true
+  clipping_inverted: false
+  alpha: 1.0
+  template_node_child: true
+  size_mode: SIZE_MODE_MANUAL
+  custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
+}
+nodes {
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+    z: 0.0
+    w: 1.0
+  }
+  color {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  type: TYPE_TEXT
+  blend_mode: BLEND_MODE_ALPHA
+  text: "engine-error"
+  font: "larryfont"
+  id: "engine-error/larrylabel"
+  xanchor: XANCHOR_NONE
+  yanchor: YANCHOR_NONE
+  pivot: PIVOT_CENTER
+  outline {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  shadow {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  adjust_mode: ADJUST_MODE_FIT
+  line_break: false
+  parent: "engine-error/larrybutton"
+  layer: ""
+  inherit_alpha: true
+  alpha: 1.0
+  outline_alpha: 1.0
+  shadow_alpha: 1.0
+  overridden_fields: 8
+  template_node_child: true
+  text_leading: 1.0
+  text_tracking: 0.0
+  custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
 }
 material: "/builtins/materials/gui.material"
 adjust_reference: ADJUST_REFERENCE_PARENT
-max_nodes: 512
+max_nodes: 32
