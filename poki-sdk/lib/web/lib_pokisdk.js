@@ -7,6 +7,7 @@ var LibPokiSdk = {
         _callback: null,
         _urlCallback: null,
         _urlParameters:null,
+        _messagesHashTable: {},
 
         _commercialBreakCallback: function() {
             {{{ makeDynCall("v", "PokiSdk._callback")}}}();
@@ -53,6 +54,10 @@ var LibPokiSdk = {
 
     PokiSdkJs_InternalCaptureError: function(formatted_string) {
         var js_formatted_string = UTF8ToString(formatted_string);
+        if (PokiSdk._messagesHashTable[js_formatted_string]) {
+            return;
+        }
+        PokiSdk._messagesHashTable[js_formatted_string] = true;
         var final_message = "DEFOLD:" + js_formatted_string;
         PokiSDK.captureError(final_message);
     },
