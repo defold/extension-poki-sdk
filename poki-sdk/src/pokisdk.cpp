@@ -259,11 +259,11 @@ static void LogListener(LogSeverity severity, const char* domain, const char* fo
 {
     switch (severity)
     {
-        case LOG_SEVERITY_WARNING:
         case LOG_SEVERITY_ERROR:
         case LOG_SEVERITY_FATAL:
             PokiSdkJs_InternalCaptureError(formatted_string);
         break;
+        case LOG_SEVERITY_WARNING:
         case LOG_SEVERITY_DEBUG:
         case LOG_SEVERITY_USER_DEBUG:
         case LOG_SEVERITY_INFO:
