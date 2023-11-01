@@ -25,7 +25,7 @@ poki_sdk.is_ad_blocked()
 ```
 Use this instruction: [PokiSDK - Defold](https://sdk.poki.com/defold.html)
 
-Do not collect Lua errors manually using `sys.set_error_handler()``. The SDK collects Lua errors and the engine's errors and warnings automatically.
+Do not collect Lua errors manually using `sys.set_error_handler()`. The SDK collects Lua errors and the engine's errors and warnings automatically.
 
 When you get your PokiSDK Sitelock code, just add it to your game as:
 ```lua
