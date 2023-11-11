@@ -130,7 +130,7 @@ static int PokiSdk_CommercialBreak(lua_State* L)
         return 0;
     }
     if (pokiSdk_Callback != 0x0) {
-        luaL_error(L, "PokiSDK CommercialBreak callback already exist. Rewrite callback");
+        dmLogError("PokiSdk_CommercialBreak PokiSDK callback already exist. Rewrite callback");
     }
     DM_LUA_STACK_CHECK(L, 0);
     pokiSdk_Callback = dmScript::CreateCallback(L, 1);
@@ -146,7 +146,7 @@ static int PokiSdk_RewardedBreak(lua_State* L)
         return 0;
     }
     if (pokiSdk_Callback != 0x0) {
-        luaL_error(L, "PokiSDK RewardedBreak callback already exist. Rewrite callback");
+        dmLogError("PokiSdk_RewardedBreak PokiSDK callback already exist. Rewrite callback");
     }
     DM_LUA_STACK_CHECK(L, 0);
     pokiSdk_Callback = dmScript::CreateCallback(L, 1);
