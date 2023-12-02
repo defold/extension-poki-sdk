@@ -5,8 +5,9 @@ brief: This manual covers how to use AdMob to show ads on iOS and Android in Def
 
 # Defold Poki SDK extension API documentation
 
-This extension provides a Poki SDK integration for Defold.
+This extension provides a Poki SDK integration for Defold. [Poki](https://poki.com) is an online playground where players and game developers come together to play and create. The games on Poki are created by a diverse global game developer community. Got a game? Submit it via [developers.poki.com](https://developers.poki.com).
 
+![Poki.com landing page](poki.png)
 
 # Installation
 To use Poki SDK in your Defold project, add a version of the Poki SDK extension to your `game.project` dependencies from the list of available [Releases](https://github.com/defold/extension-poki-sdk/releases). Find the version you want, copy the URL to ZIP archive of the release and add it to the project dependencies.
