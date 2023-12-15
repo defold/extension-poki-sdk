@@ -21,7 +21,7 @@ Select `Project->Fetch Libraries` once you have added the version to `game.proje
 
 ## Implement the gameplay events
 
-Use the `poki_sdk.gameplay_start()` event to describe when users are playing your game (e.g. level start and unpause).
+Use the `poki_sdk.gameplay_start()` event to describe when users are playing your game (e.g. on first user interaction and unpause).
 
 Use the `poki_sdk.gameplay_stop()` event to describe when users aren’t playing your game (e.g. level finish, game over, pause, quit to menu).
 
@@ -33,6 +33,7 @@ poki_sdk.gameplay_start()
 poki_sdk.gameplay_stop()
 -- game over screen pops up
 ```
+
 
 
 ## Implement commercial breaks
@@ -85,14 +86,6 @@ Congrats, you’ve successfully implemented the PokiSDK! Now upload your game to
 ## Error handling
 
 Do not collect Lua errors manually using `sys.set_error_handler()`. The SDK collects Lua errors and the engine's errors and warnings automatically.
-
-
-## Adding Sitelock
-When you get your PokiSDK Sitelock code, just add it to your game as:
-```lua
-html5.run("Sitelock JS code from Poki")
-```
-For security reasons, this piece of code is not public, so please request it from your Poki contact.
 
 
 ## Example
