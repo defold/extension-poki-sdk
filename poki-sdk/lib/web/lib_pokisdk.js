@@ -63,7 +63,8 @@ var LibPokiSdk = {
     },
 
     PokiSdkJs_IsAdBlocked: function() {
-        return PokiSDK.isAdBlocked();
+        console.log("poki_sdk.is_ad_blocked() is deprecated.");
+        return false;
     },
 
     PokiSdkJs_AddParameterForURL: function(key, value) {
