@@ -87,6 +87,38 @@ Congrats, you’ve successfully implemented the PokiSDK! Now upload your game to
 
 Do not collect Lua errors manually using `sys.set_error_handler()`. The SDK collects Lua errors and the engine's errors and warnings automatically.
 
+## Shareable URLs & URL manipulation
+
+### Creating shareable urls and changing the Poki.com url
+
+You can create a shareable url with the following function:
+
+```lua
+local params = {
+  id = "myid",
+  type = "mytype",
+  score = 28
+  -- ... any other param
+}
+poki_sdk.shareable_url(params, function(self, url)
+  print(url)
+  -- if run on e.g. https://poki.com/en/g/my-awesome-game it will return:
+  -- https://poki.com/en/g/my-awesome-game?gdid=myid&gdtype=mytype&score=28
+end)
+-- read further to see how to fetch these params easily from within your game
+```
+
+### Reading Poki.com url params
+
+As you might have noticed in the previous topic, the `poki_sdk.shareable_url()` creates a url with parameters that are prefixed with gd. We have created a simple helper function that will easily allow you to read the params.
+
+```lua
+poki_sdk.get_url_param("<param name>")
+
+-- example
+local id = poki_sdk.get_url_param("id")
+-- this will return either the gdid param set on poki.com or the id param on the current url
+```
 
 ## Example
 
