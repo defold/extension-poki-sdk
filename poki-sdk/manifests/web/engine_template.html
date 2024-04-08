@@ -18,9 +18,9 @@
 		});
 		Module['onRuntimeInitialized'] = function() {
 			PokiSDK.init().then(()=>{
-				Module.runApp("canvas", extra_params);
+				Module.runApp("canvas");
 			}).catch(()=>{
-				Module.runApp("canvas", extra_params);
+				Module.runApp("canvas");
 			});
 		};
 	</script>
