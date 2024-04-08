@@ -19,9 +19,8 @@ var LibPokiSdk = {
         },
 
         _shareableURLCallback: function(url) {
-            var url_arr = intArrayFromString(url, true);
-            var _url = allocate(url_arr, ALLOC_NORMAL);        
-            {{{ makeDynCall("vii", "PokiSdk._urlCallback")}}}(_url, url_arr.length);
+            var _url = stringToNewUTF8(url);
+            {{{ makeDynCall("vii", "PokiSdk._urlCallback")}}}(_url, lengthBytesUTF8(url));
             Module._free(_url);
         }
     },
@@ -83,9 +82,9 @@ var LibPokiSdk = {
     PokiSdkJs_GetURLParam: function(key) {
         var key = UTF8ToString(key);
         var value = PokiSDK.getURLParam(key);
-        return allocate(intArrayFromString(value), ALLOC_STACK);
+        return stringToUTF8OnStack(value);
     }
 }
 
 autoAddDeps(LibPokiSdk, '$PokiSdk');
-mergeInto(LibraryManager.library, LibPokiSdk);
+addToLibrary(LibPokiSdk);
