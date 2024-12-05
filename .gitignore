@@ -8,3 +8,8 @@ Thumbs.db
 .project
 .cproject
 builtins
+report.html
+report.json
+report_time.html
+report_time.json
+.editor_settings
