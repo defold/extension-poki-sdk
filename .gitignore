@@ -8,3 +8,9 @@ Thumbs.db
 .project
 .cproject
 builtins
+/.editor_settings
+report.html
+report.json
+report_time.html
+report_time.json
+.poki-pid
