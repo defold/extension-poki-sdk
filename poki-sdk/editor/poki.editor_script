@@ -1,0 +1,172 @@
+-- https://defold.com/manuals/editor-scripts/
+
+local M = {}
+
+local ui = editor.ui
+
+local SETTINGS = {}
+
+local function value_change_callback(id, cb)
+    return function(value)
+        SETTINGS[id] = value
+        if cb then  cb(id, value) end
+    end
+end
+
+local function merge(t1, t2)
+    local t = {}
+    for k,v in pairs(t1 or {}) do t[k] = v end
+    for k,v in pairs(t2 or {}) do t[k] = v end
+    return t
+end
+
+local function button(text, cb, props)
+    local comp = {
+        text = text,
+        on_pressed = cb
+    }
+    return ui.text(merge(comp, props))
+end
+
+local function label(text, props)
+    local comp = {
+        text = text,
+        alignment = ui.ALIGNMENT.RIGHT
+    }
+    return ui.label(merge(comp, props))
+end
+
+local function select_box(id, options, cb, props)
+    local comp = {
+        options = options,
+        on_value_changed = value_change_callback(id, cb),
+        value = options[1]
+    }
+    return ui.select_box(merge(comp, props))
+end
+
+local function check_box(id, text, cb, props)
+    local comp = {
+        text = text,
+        on_value_changed = value_change_callback(id, cb),
+        value = SETTINGS[id]
+    }
+    return ui.check_box(merge(comp, props))
+end
+
+local function vertical(children, props)
+    local comp = {
+        children = children
+    }
+    return ui.vertical(merge(comp, props))
+end
+
+
+local bundle_dialog = ui.component(function(props)
+    local wasm_web, set_wasm_web = ui.use_state(SETTINGS.wasm_web)
+    local js_web, set_js_web = ui.use_state(SETTINGS.js_web)
+
+    return ui.dialog({
+        title = "Build and Submit for QA",
+        header = vertical({
+            label("Submit for Poki QA", { alignment = ui.ALIGNMENT.LEFT }),
+            label("Proceed to submit for QA", { alignment = ui.ALIGNMENT.LEFT })
+        }),
+        content = ui.grid({
+            padding = ui.PADDING.LARGE, -- add padding around dialog edges
+            columns = {{}, { grow = true }}, -- make 2nd column grow
+            children = {
+                {
+                    label("Architectures", { alignment = ui.ALIGNMENT.TOP_RIGHT}),
+                    vertical({
+                        check_box("wasm_web", "wasm-web", set_wasm_web),
+                        check_box("js_web", "js-web", set_js_web)
+                    })
+                },
+                {
+                    label("Variant"),
+                    select_box("variant", { "Debug", "Release" }),
+                },
+                {
+                    label("Texture Compression"),
+                    select_box("texture_compression", { "Enabled", "Disabled" }),
+                },
+                {
+                    label(""),
+                    check_box("debug_symbols", "Generate debug symbols"),
+                },
+                {
+                    label(""),
+                    check_box("build_report", "Generate build report"),
+                },
+                {
+                    label(""),
+                    check_box("live_update", "Publish Live Update content"),
+                }
+            }
+        }),
+        buttons = {
+            ui.dialog_button({
+                text = "Cancel",
+                cancel = true,
+                result = false
+            }),
+            ui.dialog_button({
+                text = "Submit",
+                default = true,
+                result = true,
+                enabled = (wasm_web == true) or (js_web == true),
+            })
+        }
+    })
+end)
+
+
+function M.get_commands()
+    return {
+        {
+            label = "Bundle for Poki QA",
+            locations = { "View" },
+            run = function()
+                SETTINGS = {
+                    wasm_web = true
+                }
+                local result = ui.show_dialog(bundle_dialog({}))
+                print('Perform action:', result)
+                if result == false then
+                    return
+                end
+
+                local bundle_output = "build/bundle_web"
+                editor.delete_directory("/" .. bundle_output)
+                editor.create_directory("/" .. bundle_output)
+
+                print("Bundling", SETTINGS.build_report)
+                local options = {
+                    ["archive"] = true,
+                    ["verbose"] = true,
+                    ["platform"] = "js-web",
+                    ["architectures"] = nil,
+                    ["with-symbols"] = SETTINGS.debug_symbols,
+                    ["build-report-json"] = SETTINGS.build_report and "report.json" or nil,
+                    ["build-report-html"] = SETTINGS.build_report and "report.html" or nil,
+                    ["bundle-output"] = bundle_output,
+                }
+                local architectures = {}
+                if SETTINGS.wasm_web then architectures[#architectures + 1] = "wasm-web" end
+                if SETTINGS.js_web then architectures[#architectures + 1] = "js-web" end
+                options.architectures = table.concat(architectures, ",")
+
+                editor.bob(options, "build", "bundle")
+                print("Bundle completed")
+
+                print("Starting webserver")
+                local port = 8000
+                editor.execute("bash", "poki-sdk/editor/starthttpserver.sh", bundle_output, tostring(port))
+                print("Done")
+            end
+        }
+    }
+end
+
+return M
