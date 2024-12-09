@@ -3,6 +3,13 @@ BUNDLE_OUTPUT=$1
 PORT=$2
 PIDFILE=.poki-pid
 ZIPFILE=poki.zip
+PYTHON3=$(which python3)
+
+# check that python3 is installed
+if [[ "$PYTHON3" == "" ]]; then
+	echo "python3 was not found!"
+	exit 1
+fi
 
 # zip bundle output
 if [ -f ${BUNDLE_OUTPUT}/${ZIPFILE} ]; then
