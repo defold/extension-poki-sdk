@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <head>
-	<link rel="dns-prefetch" href="//game-cdn.poki.com" />
 	<link rel="dns-prefetch" href="//api.poki.com" />
 	<link rel="dns-prefetch" href="//a.poki-cdn.com" />
 	<script defer src="//game-cdn.poki.com/scripts/v2/poki-sdk.js" onload="poki_sdk_loaded()"></script>
@@ -9,7 +8,6 @@
 <body>
 	<script id='poki-sdk-setup' type='text/javascript'>
 		function poki_sdk_loaded() {
-			console.log("Callback called");
 			var data = {};
 			var isLoadFinished = false;
 			Progress.addListener(function(percentage){
