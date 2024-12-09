@@ -17,19 +17,21 @@ if [ -f ${BUNDLE_OUTPUT}/${ZIPFILE} ]; then
 fi
 (cd ${BUNDLE_OUTPUT}; zip -r poki.zip .;)
 
-# check if there's a saved server pid
+# check if there's a saved server pid - kill it!
 if [ -f ${PIDFILE} ]; then
 	PID=$(<${PIDFILE})
-	echo "FOUND PID ${PID}"
+	echo "Killing old http server with id '${PID}'"
 	kill ${PID}
 	rm ${PIDFILE}
 fi
 
-nohup /usr/local/bin/python poki-sdk/editor/httpserver.py ${BUNDLE_OUTPUT} ${PORT} &
-# nohup /usr/local/bin/python -m http.server -d ${BUNDLE_OUTPUT} ${PORT}
+# start the server and get the pid
+${PYTHON3} poki-sdk/editor/httpserver.py ${BUNDLE_OUTPUT} ${PORT} &
 PID=$!
 
-echo "pid ${PID}"
+echo "Started a new server with pid '${PID}'"
+
+# store pid in file
 echo "${PID}" > ${PIDFILE}
 
 open https://app.poki.dev/upload-defold?project=MYPROJECT&zipfile=http://127.0.0.1:${PORT}/${ZIPFILE}
