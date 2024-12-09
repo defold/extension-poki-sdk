@@ -163,6 +163,7 @@ function M.get_commands()
                 print("Starting webserver")
                 local port = 8000
                 editor.execute("bash", "poki-sdk/editor/starthttpserver.sh", bundle_output, tostring(port))
+                --editor.browser("https://app.poki.dev/upload-defold?project=MYPROJECT&zipfile=http://127.0.0.1:" .. port .. "/poki.zip")
                 print("Done")
             end
         }
