@@ -14,7 +14,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     # GET
     def do_GET(self):
-        print("do_GET")
         try:
             f = open(os.path.join(self.directory, self.path[1:]), 'rb')
             body = f.read()
