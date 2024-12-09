@@ -1,28 +1,43 @@
 <!DOCTYPE html>
 <head>
-	<script src="//game-cdn.poki.com/scripts/v2/poki-sdk.js"></script>
+	<link rel="dns-prefetch" href="//api.poki.com" />
+	<link rel="dns-prefetch" href="//a.poki-cdn.com" />
+	<script defer src="//game-cdn.poki.com/scripts/v2/poki-sdk.js" onload="poki_sdk_loaded()"></script>
 </head>
 
 <body>
 	<script id='poki-sdk-setup' type='text/javascript'>
-		var data = {};
-		var isLoadFinished = false;
-		Progress.addListener(function(percentage){
-			data.percentageDone = percentage / 100;
-			if (!isLoadFinished)
-				PokiSDK.gameLoadingProgress(data);
-			if (percentage == 100 && !isLoadFinished) {
-				PokiSDK.gameLoadingFinished();
-				isLoadFinished = true;
-			}
-		});
-		Module['onRuntimeInitialized'] = function() {
-			PokiSDK.init().then(()=>{
-				Module.runApp("canvas");
-			}, ()=>{
-				Module.runApp("canvas");
+		function poki_sdk_loaded() {
+			var data = {};
+			var isLoadFinished = false;
+			Progress.addListener(function(percentage){
+				data.percentageDone = percentage / 100;
+				if (!isLoadFinished)
+					PokiSDK.gameLoadingProgress(data);
+				if (percentage == 100 && !isLoadFinished) {
+					PokiSDK.gameLoadingFinished();
+					isLoadFinished = true;
+				}
 			});
-		};
+			var isWasmLoaded = false;
+			var isPokiSDKInited = false;
+			var runFunc = function() {
+				if (isPokiSDKInited && isWasmLoaded) {
+					Module.runApp("canvas");
+				}
+			}
+			Module['onRuntimeInitialized'] = function() {
+				isWasmLoaded = true;
+				runFunc();
+			};
+			PokiSDK.init().then(()=>{
+					isPokiSDKInited = true;
+					runFunc();
+				}, ()=>{
+					isPokiSDKInited = true;
+					runFunc();
+				});
+		}
 	</script>
 </body>
 </html>
