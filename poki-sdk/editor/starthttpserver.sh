@@ -34,4 +34,8 @@ echo "Started a new server with pid '${PID}'"
 # store pid in file
 echo "${PID}" > ${PIDFILE}
 
-open https://app.poki.dev/upload-defold?project=MYPROJECT&zipfile=http://127.0.0.1:${PORT}/${ZIPFILE}
+# open poki upload page
+PROJECT=DefoldProject
+URL="https://app.poki.dev/upload-defold?project=${PROJECT}&zipfile=http://127.0.0.1:${PORT}/${ZIPFILE}"
+echo "Opening URL ${URL}"
+open "${URL}"
