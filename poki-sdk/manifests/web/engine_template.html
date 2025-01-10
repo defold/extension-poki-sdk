@@ -7,6 +7,17 @@
 
 <body>
 	<script id='poki-sdk-setup' type='text/javascript'>
+		var isWasmLoaded = false;
+		var isPokiSDKInited = false;
+		var runFunc = function() {
+			if (isPokiSDKInited && isWasmLoaded) {
+				Module.runApp("canvas");
+			}
+		}
+		Module['onRuntimeInitialized'] = function() {
+			isWasmLoaded = true;
+			runFunc();
+		};
 		function poki_sdk_loaded() {
 			var data = {};
 			var isLoadFinished = false;
@@ -19,17 +30,6 @@
 					isLoadFinished = true;
 				}
 			});
-			var isWasmLoaded = false;
-			var isPokiSDKInited = false;
-			var runFunc = function() {
-				if (isPokiSDKInited && isWasmLoaded) {
-					Module.runApp("canvas");
-				}
-			}
-			Module['onRuntimeInitialized'] = function() {
-				isWasmLoaded = true;
-				runFunc();
-			};
 			PokiSDK.init().then(()=>{
 					isPokiSDKInited = true;
 					runFunc();
