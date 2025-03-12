@@ -56,7 +56,11 @@ end
 function M.get_http_server_routes()
     return {
         http.server.route("/poki/" .. POKI_ZIP, "GET", function(request)
-            return http.server.external_file_response(POKI_ZIP)
+            local headers = {
+                ["access-control-allow-origin"] = "*",
+                ["content-type"] = "application/zip",
+            }
+            return http.server.external_file_response(POKI_ZIP, 200, headers)
         end)
     }
 end
