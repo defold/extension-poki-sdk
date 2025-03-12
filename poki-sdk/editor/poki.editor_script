@@ -1,5 +1,15 @@
 local M = {}
 
+local POKI_ZIP = "poki.zip"
+
+-- https://help.interfaceware.com/code/details/urlcode-lua
+local function urlencode(str)
+    str = string.gsub (str, "([^0-9a-zA-Z !'()*._~-])", -- locale independent
+    function (c) return string.format ("%%%02X", string.byte(c)) end)
+    str = string.gsub (str, " ", "+")
+    return str
+end
+
 local function poki_errors(config)
     if not next(config.architectures) then
         return "At least one architecture must be selected."
@@ -21,17 +31,34 @@ local poki_bundle_dialog = editor.ui.component(function(props)
 end)
 
 local function bundle_poki(show_dialog)
+    local project_title = editor.get("/game.project", "project.title")
+
     local config = editor.bundle.config(show_dialog, "bundle.poki", poki_bundle_dialog, poki_errors)
     local js = config.architectures["js-web"]
     local wasm = config.architectures["wasm-web"]
     local output_subdir = (js and wasm and "universal-web") or (js and "js-web") or "wasm-web"
     local output_directory = editor.bundle.output_directory(show_dialog, output_subdir)
     local architectures = (js and wasm and "js-web,wasm-web") or (js and "js-web") or "wasm-web"
-    editor.bundle.create(config, output_directory, {platform = "js-web", architectures = architectures})
+    editor.bundle.create(config, output_directory, { platform = "js-web", architectures = architectures })
 
-    local port = 8000
-    editor.execute("bash", "poki-sdk/editor/starthttpserver.sh", output_directory, tostring(port))
-    --editor.browser("https://app.poki.dev/upload-defold?project=MYPROJECT&zipfile=http://127.0.0.1:" .. port .. "/poki.zip")
+    -- zip bundle output directory
+    zip.pack(POKI_ZIP, { 
+        { output_directory .. "/" .. project_title, project_title }
+    })
+    
+    -- browse to poki uploader
+    local urlfmt = "https://app.poki.dev/upload-defold?project=%s&zipfile=http://127.0.0.1:%s/poki/%s"
+    local url = string.format(urlfmt, urlencode(project_title), http.server.port, POKI_ZIP)
+    print("Opening", url)
+    editor.browse(url)
+end
+
+function M.get_http_server_routes()
+    return {
+        http.server.route("/poki/" .. POKI_ZIP, "GET", function(request)
+            return http.server.external_file_response(POKI_ZIP)
+        end)
+    }
 end
 
 function M.get_commands()
