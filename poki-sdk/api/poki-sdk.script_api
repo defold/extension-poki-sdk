@@ -29,6 +29,10 @@
     type: function
 
     parameters:
+    - name: size
+      type: string
+      desc: The size of the reward. Accepted values are small, medium and large.
+
     - name: callback
       type: function
 
@@ -77,3 +81,11 @@
 
 #*****************************************************************************************************
 
+  - name: REWARDED_BREAK_ERROR
+    type: number
+  - name: REWARDED_BREAK_SUCCESS
+    type: number
+  - name: REWARDED_BREAK_START
+    type: number
+
+#*****************************************************************************************************

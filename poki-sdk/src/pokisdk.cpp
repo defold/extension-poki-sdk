@@ -13,8 +13,16 @@ enum PokiCallbackType
     TYPE_SHARABLE_URL
 };
 
+// make sure these match with the constants in lib_pokisdk.js
+enum PokiRewardedBreakResult
+{
+    REWARDED_BREAK_ERROR = 0,
+    REWARDED_BREAK_SUCCESS = 1,
+    REWARDED_BREAK_START = 2,
+};
+
 typedef void (*CommercialBreakCallback)();
-typedef void (*RewardedBreakCallback)(int success);
+typedef void (*RewardedBreakCallback)(PokiRewardedBreakResult result);
 typedef void (*ShareableURLCallback)(const char* url, int url_length);
 
 extern "C" {
@@ -25,7 +33,7 @@ extern "C" {
     void PokiSdkJs_InternalCaptureError(const char* formatted_string);
 
     void PokiSdkJs_CommercialBreak(CommercialBreakCallback callback);
-    void PokiSdkJs_RewardedBreak(RewardedBreakCallback callback);
+    void PokiSdkJs_RewardedBreak(const char* size, RewardedBreakCallback callback);
 
     int PokiSdkJs_IsAdBlocked();
 
@@ -69,9 +77,15 @@ static void PokiSdk_InvokeCallback(PokiCallbackType callbackType, int intArg, co
 
     int numOfArgs = 0;
 
+    bool destroy_callback = true;
+
     if (callbackType == TYPE_REWARDED)
     {
-        lua_pushboolean(L, intArg);
+        // do not destroy the callback if the event is REWARDED_BREAK_START
+        // since we need to use the callback later when the event
+        // is REWARDED_BREAK_SUCCESS
+        destroy_callback = (intArg != REWARDED_BREAK_START);
+        lua_pushnumber(L, intArg);
         numOfArgs = 1;
     }
     else if (callbackType == TYPE_SHARABLE_URL)
@@ -86,7 +100,7 @@ static void PokiSdk_InvokeCallback(PokiCallbackType callbackType, int intArg, co
 
     dmScript::TeardownCallback(pokiSdk_Callback);
 
-    if (pokiSdk_Callback != 0x0)
+    if ((pokiSdk_Callback != 0x0) && destroy_callback)
     {
         dmScript::DestroyCallback(pokiSdk_Callback);
         pokiSdk_Callback = 0x0;
@@ -98,9 +112,9 @@ static void PokiSdk_CommercialBreakCallback()
     PokiSdk_InvokeCallback(TYPE_INTERSTITIAL, 0, 0);
 }
 
-static void PokiSdk_RewardedBreakCallback(int success)
+static void PokiSdk_RewardedBreakCallback(PokiRewardedBreakResult result)
 {
-    PokiSdk_InvokeCallback(TYPE_REWARDED, success, 0);
+    PokiSdk_InvokeCallback(TYPE_REWARDED, result, 0);
 }
 
 static void PokiSdk_ShareableURLCallback(const char* url, int url_length)
@@ -140,7 +154,9 @@ static int PokiSdk_CommercialBreak(lua_State* L)
 
 static int PokiSdk_RewardedBreak(lua_State* L)
 {
-    int type = lua_type(L, 1);
+    DM_LUA_STACK_CHECK(L, 0);
+
+    int type = lua_type(L, 2);
     if (type != LUA_TFUNCTION) {
         luaL_error(L, "PokiSDK RewardedBreak callback is invalid. Use callback function as an argument when show ADS.");
         return 0;
@@ -148,9 +164,11 @@ static int PokiSdk_RewardedBreak(lua_State* L)
     if (pokiSdk_Callback != 0x0) {
         dmLogError("PokiSdk_RewardedBreak PokiSDK callback already exist. Rewrite callback");
     }
-    DM_LUA_STACK_CHECK(L, 0);
-    pokiSdk_Callback = dmScript::CreateCallback(L, 1);
-    PokiSdkJs_RewardedBreak((RewardedBreakCallback)PokiSdk_RewardedBreakCallback);
+    const char* size = luaL_checkstring(L, 1);
+    pokiSdk_Callback = dmScript::CreateCallback(L, 2);
+
+    PokiSdkJs_RewardedBreak(size, (RewardedBreakCallback)PokiSdk_RewardedBreakCallback);
+
     return 0;
 }
 
@@ -240,11 +258,19 @@ static const luaL_reg Module_methods[] =
     {0, 0}
 };
 
+#define SETCONSTANT(name, value) \
+    lua_pushnumber(L, (lua_Number) (value)); \
+    lua_setfield(L, -2, #name);\
+
 static void LuaInit(lua_State* L)
 {
     int top = lua_gettop(L);
 
     luaL_register(L, MODULE_NAME, Module_methods);
+
+    SETCONSTANT(REWARDED_BREAK_ERROR, REWARDED_BREAK_ERROR);
+    SETCONSTANT(REWARDED_BREAK_SUCCESS, REWARDED_BREAK_SUCCESS);
+    SETCONSTANT(REWARDED_BREAK_START, REWARDED_BREAK_START);
 
     lua_pop(L, 1);
     assert(top == lua_gettop(L));
