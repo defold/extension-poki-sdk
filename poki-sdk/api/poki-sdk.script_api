@@ -31,7 +31,7 @@
     parameters:
     - name: size
       type: string
-      desc: The size of the reward. Accepted values are small, medium and large.
+      desc: The size of the reward. Accepted values are small, medium and large. Optional. Default is small.
 
     - name: callback
       type: function
