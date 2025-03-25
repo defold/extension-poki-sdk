@@ -67,7 +67,7 @@ end
 
 function M.get_commands()
     return {
-        editor.bundle.command("Poki QA...", "bundle-poki", bundle_poki)
+        editor.bundle.command("Poki", "bundle-poki", bundle_poki)
     }
 end
 
