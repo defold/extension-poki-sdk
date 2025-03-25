@@ -62,7 +62,7 @@ static void PokiSdk_InvokeCallback(PokiCallbackType callbackType, int intArg, co
 {
     if (!dmScript::IsCallbackValid(pokiSdk_Callback))
     {
-        dmLogError("PokiSDK InvokeCallback callback is invalid. Use callback function as an argument when show ADS.");
+        dmLogError("PokiSDK InvokeCallback callback is invalid. Use callback function as an argument when showing ads.");
         return;
     }
 
@@ -139,11 +139,13 @@ static int PokiSdk_GameplayStop(lua_State* L)
 static int PokiSdk_CommercialBreak(lua_State* L)
 {
     int type = lua_type(L, 1);
-    if (type != LUA_TFUNCTION) {
-        luaL_error(L, "PokiSDK CommercialBreak callback is invalid. Use callback function as an argument when show ADS.");
+    if (type != LUA_TFUNCTION)
+    {
+        luaL_error(L, "PokiSDK CommercialBreak callback is invalid. Use callback function as an argument when showing ads.");
         return 0;
     }
-    if (pokiSdk_Callback != 0x0) {
+    if (pokiSdk_Callback != 0x0)
+    {
         dmLogError("PokiSdk_CommercialBreak PokiSDK callback already exist. Rewrite callback");
     }
     DM_LUA_STACK_CHECK(L, 0);
@@ -152,20 +154,35 @@ static int PokiSdk_CommercialBreak(lua_State* L)
     return 0;
 }
 
+static void PokiSdk_SetRewardedBreakCallback(lua_State* L, int index)
+{
+    if (lua_type(L, index) != LUA_TFUNCTION)
+    {
+        luaL_error(L, "PokiSDK RewardedBreak callback is invalid. Use callback function as an argument when showing ads.");
+        return;
+    }
+
+    if (pokiSdk_Callback != 0x0)
+    {
+        dmLogError("PokiSdk_RewardedBreak PokiSDK callback already exist. Rewrite callback");
+    }
+    pokiSdk_Callback = dmScript::CreateCallback(L, index);
+}
+
 static int PokiSdk_RewardedBreak(lua_State* L)
 {
     DM_LUA_STACK_CHECK(L, 0);
-
-    int type = lua_type(L, 2);
-    if (type != LUA_TFUNCTION) {
-        luaL_error(L, "PokiSDK RewardedBreak callback is invalid. Use callback function as an argument when show ADS.");
-        return 0;
+    const char* size;
+    if (lua_type(L, 1) == LUA_TSTRING)
+    {
+        size = luaL_checkstring(L, 1);
+        PokiSdk_SetRewardedBreakCallback(L, 2);
     }
-    if (pokiSdk_Callback != 0x0) {
-        dmLogError("PokiSdk_RewardedBreak PokiSDK callback already exist. Rewrite callback");
+    else
+    {
+        size = "small";
+        PokiSdk_SetRewardedBreakCallback(L, 1);
     }
-    const char* size = luaL_checkstring(L, 1);
-    pokiSdk_Callback = dmScript::CreateCallback(L, 2);
 
     PokiSdkJs_RewardedBreak(size, (RewardedBreakCallback)PokiSdk_RewardedBreakCallback);
 
