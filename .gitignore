@@ -13,3 +13,5 @@ report.json
 report_time.html
 report_time.json
 .editor_settings
+manifest.public.der
+manifest.private.der
