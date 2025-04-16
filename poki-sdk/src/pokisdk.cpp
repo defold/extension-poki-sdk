@@ -40,6 +40,8 @@ extern "C" {
     void PokiSdkJs_AddParameterForURL(const char* key, const char* value);
     void PokiSdkJs_ShareableURL(ShareableURLCallback callback);
     const char* PokiSdkJs_GetURLParam(const char* key);
+
+    void PokiSdkJs_Measure(const char* category, const char* what, const char* action);
 }
 
 static dmScript::LuaCallbackInfo* pokiSdk_Callback = 0x0;
@@ -260,6 +262,18 @@ static int PokiSdk_GetURLParam(lua_State* L)
     return 1;
 }
 
+static int PokiSdk_Measure(lua_State* L)
+{
+    DM_LUA_STACK_CHECK(L, 0);
+    const char* category = luaL_checkstring(L, 1);
+    // what is optional and defaults to an empty string
+    const char* what = luaL_optstring(L, 2, "");
+    // action is optional and defaults to an empty string
+    const char* action = luaL_optstring(L, 3, "");
+    PokiSdkJs_Measure(category, what, action);
+    return 0;
+}
+
 // Functions exposed to Lua
 static const luaL_reg Module_methods[] =
 {
@@ -272,6 +286,7 @@ static const luaL_reg Module_methods[] =
     {"is_ad_blocked", PokiSdk_IsAdBlocked},
     {"shareable_url", PokiSdk_ShareableURL},
     {"get_url_param", PokiSdk_GetURLParam},
+    {"measure", PokiSdk_Measure},
     {0, 0}
 };
 
