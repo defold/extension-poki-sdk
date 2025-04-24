@@ -19,10 +19,18 @@ local function on_commercial_break_finished(self)
 	gui.set_text(gui.get_node("success"), "Comercial finished")
 end
 
-local function on_rewarded_break_finished(self, success)
-	print("Rewarded success: "..tostring(success))
-	sound.pause("#sound", false)
-	gui.set_text(gui.get_node("success"), "Rewarded success: "..tostring(success))
+local function on_rewarded_break_finished(self, status)
+	if status == poki_sdk.REWARDED_BREAK_ERROR then
+		print("Rewarded break error!")
+		gui.set_text(gui.get_node("success"), "Rewarded error")
+	elseif status == poki_sdk.REWARDED_BREAK_START then
+		print("Rewarded break start")
+		gui.set_text(gui.get_node("success"), "Rewarded start")
+	elseif status == poki_sdk.REWARDED_BREAK_SUCCESS then
+		print("Rewarded break success")
+		sound.pause("#sound", false)
+		gui.set_text(gui.get_node("success"), "Rewarded success")
+	end
 end
 
 local function on_shareable_url_ready(self, url)
