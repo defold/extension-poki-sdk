@@ -54,7 +54,7 @@ Not every single `poki_sdk.commercial_break()` will trigger an ad. Poki’s syst
 Rewarded breaks allow for a user to choose to watch a rewarded video ad in exchange for a certain benefit in the game (e.g. more coins, etc.). When using `poki_sdk.rewarded_break()`, please make it clear to the player beforehand that they’re about to watch an ad.
 
 ```lua
-status-- gameplay stops
+-- gameplay stops
 poki_sdk.rewarded_break(function(self, status)
   if status == poki_sdk.REWARDED_BREAK_ERROR then
 		print("Rewarded break error!")
