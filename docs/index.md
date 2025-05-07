@@ -57,12 +57,12 @@ Rewarded breaks allow for a user to choose to watch a rewarded video ad in excha
 -- gameplay stops
 poki_sdk.rewarded_break(function(self, status)
   if status == poki_sdk.REWARDED_BREAK_ERROR then
-		print("Rewarded break error!")
-	elseif status == poki_sdk.REWARDED_BREAK_START then
-		print("Rewarded break start")
-	elseif status == poki_sdk.REWARDED_BREAK_SUCCESS then
-		print("Rewarded break success")
-	end
+    print("Rewarded break error!")
+  elseif status == poki_sdk.REWARDED_BREAK_START then
+    print("Rewarded break start")
+  elseif status == poki_sdk.REWARDED_BREAK_SUCCESS then
+    print("Rewarded break success")
+  end
 end)
 ```
 
