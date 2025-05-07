@@ -54,8 +54,16 @@ Not every single `poki_sdk.commercial_break()` will trigger an ad. Poki’s syst
 Rewarded breaks allow for a user to choose to watch a rewarded video ad in exchange for a certain benefit in the game (e.g. more coins, etc.). When using `poki_sdk.rewarded_break()`, please make it clear to the player beforehand that they’re about to watch an ad.
 
 ```lua
--- gameplay stops
-poki_sdk.rewarded_break(function(self, success)end)
+status-- gameplay stops
+poki_sdk.rewarded_break(function(self, status)
+  if status == poki_sdk.REWARDED_BREAK_ERROR then
+		print("Rewarded break error!")
+	elseif status == poki_sdk.REWARDED_BREAK_START then
+		print("Rewarded break start")
+	elseif status == poki_sdk.REWARDED_BREAK_SUCCESS then
+		print("Rewarded break success")
+	end
+end)
 ```
 
 ### About the rewarded break timer
@@ -71,9 +79,14 @@ Make sure that audio and keyboard input are disabled during commercialBreaks, so
 
 ```lua
 -- gameplay stops
--- fire your mute audio function
+-- fire your mute audio function, for example:
+sound.pause("#music", true)
 poki_sdk.commercial_break(function(self)
-  -- fire your unmute audio function
+  -- fire your unmute audio function, for example:
+  if status == poki_sdk.REWARDED_BREAK_ERROR or
+     status == poki_sdk.REWARDED_BREAK_SUCCESS then
+     sound.pause("#music", false)
+  end
   -- fire your function to continue to game
 end)
 ```
