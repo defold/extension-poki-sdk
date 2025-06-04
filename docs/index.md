@@ -157,6 +157,3 @@ poki_sdk.capture_error(error_string) -- in JS it's PokiSDK.captureError(error_st
 poki_sdk.shareable_url(params, callback) -- in JS it's PokiSDK.shareableURL({}).then(url => {})
 local value = poki_sdk.get_url_param(key) -- in JS it's PokiSDK.getURLParam('id')
 ```
-
-
-## API reference
