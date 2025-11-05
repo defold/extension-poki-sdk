@@ -156,4 +156,5 @@ poki_sdk.set_debug(value) -- in JS it's PokiSDK.setDebug(value)
 poki_sdk.capture_error(error_string) -- in JS it's PokiSDK.captureError(error_string)
 poki_sdk.shareable_url(params, callback) -- in JS it's PokiSDK.shareableURL({}).then(url => {})
 local value = poki_sdk.get_url_param(key) -- in JS it's PokiSDK.getURLParam('id')
+poki_sdk.measure(category, what, action) -- in JS it's PokiSDK.measure(category, what, action)
 ```

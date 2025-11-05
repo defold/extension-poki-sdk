@@ -97,7 +97,11 @@ var LibPokiSdk = {
         var key = UTF8ToString(key);
         var value = PokiSDK.getURLParam(key);
         return stringToUTF8OnStack(value);
-    }
+    },
+
+    PokiSdkJs_Measure: function(category, what, action) {
+        PokiSDK.measure(UTF8ToString(category), UTF8ToString(what), UTF8ToString(action));
+    },
 }
 
 autoAddDeps(LibPokiSdk, '$PokiSdk');

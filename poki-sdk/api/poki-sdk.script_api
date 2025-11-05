@@ -93,6 +93,19 @@
 
 #*****************************************************************************************************
 
+  - name: measure
+    type: function
+
+    parameters:
+    - name: category
+      type: string
+    - name: what
+      type: string
+    - name: action
+      type: string
+
+#*****************************************************************************************************
+
   - name: REWARDED_BREAK_ERROR
     type: number
   - name: REWARDED_BREAK_SUCCESS
