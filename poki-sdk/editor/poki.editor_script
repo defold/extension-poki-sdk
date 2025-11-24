@@ -103,7 +103,6 @@ local function build_poki_html5()
 end
 
 function M.get_http_server_routes()
-    local project_route = string.format("/%s", project_title())
     return {
         http.server.route("/poki/" .. POKI_ZIP, "GET", function(request)
             local headers = {
@@ -111,7 +110,7 @@ function M.get_http_server_routes()
                 ["content-type"] = "application/zip",
             }
             return http.server.external_file_response(POKI_ZIP, 200, headers)
-        end),
+        end)
     }
 end
 
