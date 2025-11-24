@@ -61,9 +61,12 @@ local function bundle_poki(show_dialog)
 end
 
 local function ensure_directory(path)
-    local attrs = editor.external_file_attributes(path)
-    if not attrs.exists then
-        editor.execute("mkdir", "-p", path, { reload_resources = false })
+    if not editor.external_file_attributes(path).exists then
+        if editor.platform:sub(-#"win32") == "win32" then
+            editor.execute("cmd.exe", "/c", "mkdir", path:gsub("/", "\\"), {reload_resources = false})
+        else
+            editor.execute("mkdir", "-p", path, {reload_resources = false})
+        end
     end
     return editor.external_file_attributes(path).path
 end
