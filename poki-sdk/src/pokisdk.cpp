@@ -6,6 +6,8 @@
 
 #if defined(DM_PLATFORM_HTML5)
 
+static const dmhash_t MASTER_SOUND_GROUP = dmHashString64("master");
+
 enum PokiCallbackType
 {
     TYPE_INTERSTITIAL,
@@ -97,6 +99,11 @@ static void PokiSdk_InvokeCallback(PokiCallbackType callbackType, int intArg, co
     }
     numOfArgs += 1;
 
+    if ((pokiSdk_Callback != 0x0) && destroy_callback)
+    {
+        dmSound::SetGroupMute(MASTER_SOUND_GROUP, false);
+    }
+
     int ret = dmScript::PCall(L, numOfArgs, 0);
     (void)ret;
 
@@ -111,11 +118,13 @@ static void PokiSdk_InvokeCallback(PokiCallbackType callbackType, int intArg, co
 
 static void PokiSdk_CommercialBreakCallback()
 {
+    dmSound::SetGroupMute(MASTER_SOUND_GROUP, true);
     PokiSdk_InvokeCallback(TYPE_INTERSTITIAL, 0, 0);
 }
 
 static void PokiSdk_RewardedBreakCallback(PokiRewardedBreakResult result)
 {
+    dmSound::SetGroupMute(MASTER_SOUND_GROUP, true);
     PokiSdk_InvokeCallback(TYPE_REWARDED, result, 0);
 }
 
