@@ -92,8 +92,7 @@ local function build_poki_html5()
         bundle_output = launch_dir,
         platform = "js-web",
         verbose = true,
-        variant = "debug",
-        defoldsdk = "cddb6eb43c32e4930257fcbbb30f19cf28deb081",
+        variant = "debug"
     }
 
     editor.bob(bob_opts, "build", "bundle")
