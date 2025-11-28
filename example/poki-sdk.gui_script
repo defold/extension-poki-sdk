@@ -15,7 +15,6 @@ end
 local function on_commercial_break_finished(self)
 	-- continue game
 	print("Comercial finished")
-	sound.pause("#sound", false)
 	gui.set_text(gui.get_node("success"), "Comercial finished")
 end
 
@@ -28,7 +27,6 @@ local function on_rewarded_break_finished(self, status)
 		gui.set_text(gui.get_node("success"), "Rewarded start")
 	elseif status == poki_sdk.REWARDED_BREAK_SUCCESS then
 		print("Rewarded break success")
-		sound.pause("#sound", false)
 		gui.set_text(gui.get_node("success"), "Rewarded success")
 	end
 end
@@ -50,13 +48,11 @@ function on_input(self, action_id, action)
 
 		dirtylarry:button("commercial", action_id, action, function()
 			print("Click Show commercial")
-			sound.pause("#sound", true)
 			poki_sdk.commercial_break(on_commercial_break_finished)
 		end)
 
 		dirtylarry:button("reward", action_id, action, function()
 			print("Click Show reward")
-			sound.pause("#sound", true)
 			poki_sdk.rewarded_break(on_rewarded_break_finished)
 		end)
 

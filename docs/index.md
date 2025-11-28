@@ -91,6 +91,12 @@ poki_sdk.commercial_break(function(self)
 end)
 ```
 
+::: important
+
+Beginning with Poki Extension 3.3.0, sound will be muted automatically when ADS are shown.
+
+:::
+
 ### Upload and test your game in Poki for Developers
 
 Congrats, you’ve successfully implemented the PokiSDK! Now upload your game to the Poki Inspector and test it there. When you’re happy with the implementation, send Poki a review request and they'll play the game. Feel free to contact Poki via Discord or developersupport@poki.com if you’re stuck.
