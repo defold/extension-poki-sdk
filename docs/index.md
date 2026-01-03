@@ -81,7 +81,7 @@ Make sure that audio and keyboard input are disabled during `commercial_break` a
 -- gameplay stops
 -- fire your mute audio function, for example:
 sound.pause("#music", true)
-poki_sdk.rewarded_break(function(self)
+poki_sdk.rewarded_break(function(self, status)
   -- fire your unmute audio function, for example:
   if status == poki_sdk.REWARDED_BREAK_ERROR or
      status == poki_sdk.REWARDED_BREAK_SUCCESS then
