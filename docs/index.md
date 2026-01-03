@@ -75,13 +75,13 @@ Calling `poki_sdk.rewarded_break()` affects the timing of `poki_sdk.commercial_b
 
 ### Disable sound and input during ads
 
-Make sure that audio and keyboard input are disabled during commercialBreaks, so that the game doesn’t interfere with the ad:
+Make sure that audio and keyboard input are disabled during `commercial_break` and `rewarded_break`, so that the game doesn’t interfere with the ad:
 
 ```lua
 -- gameplay stops
 -- fire your mute audio function, for example:
 sound.pause("#music", true)
-poki_sdk.commercial_break(function(self)
+poki_sdk.rewarded_break(function(self)
   -- fire your unmute audio function, for example:
   if status == poki_sdk.REWARDED_BREAK_ERROR or
      status == poki_sdk.REWARDED_BREAK_SUCCESS then
