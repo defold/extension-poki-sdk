@@ -102,6 +102,10 @@ var LibPokiSdk = {
     PokiSdkJs_Measure: function(category, what, action) {
         PokiSDK.measure(UTF8ToString(category), UTF8ToString(what), UTF8ToString(action));
     },
+
+    PokiSdkJs_MovePill: function(topPercent, topPx) {
+        PokiSDK.movePill(topPercent, topPx);
+    },
 }
 
 autoAddDeps(LibPokiSdk, '$PokiSdk');
