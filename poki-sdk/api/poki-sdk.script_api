@@ -106,6 +106,17 @@
 
 #*****************************************************************************************************
 
+  - name: move_pill
+    type: function
+
+    parameters:
+    - name: topPercent
+      type: number
+    - name: topPx
+      type: number
+
+#*****************************************************************************************************
+
   - name: REWARDED_BREAK_ERROR
     type: number
   - name: REWARDED_BREAK_SUCCESS

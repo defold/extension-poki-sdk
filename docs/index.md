@@ -139,6 +139,27 @@ local id = poki_sdk.get_url_param("id")
 -- this will return either the gdid param set on poki.com or the id param on the current url
 ```
 
+### Moving the Poki Pill on mobile
+
+On mobile, you can reposition the Poki Pill slightly to better fit your game UI using `move_pill(topPercent, topPx)`.
+
+- `topPercent` is a number between `0` and `50` and sets the pill's vertical position as a percentage from the top of the game area.
+- `topPx` is an additional pixel offset applied on top of `topPercent` (positive moves it down, negative moves it up).
+
+You can't move the pill lower than 50% of the game area (the game bar at the bottom is not included in this area).
+
+The default position is `move_pill(0, 20)`.
+
+**Poki Pill size**
+
+- `46px × 62px` on screens narrower than `1211px`.
+- `92px × 64px` on screens `1211px` wide or wider.
+
+```lua
+-- Move the pill 100 pixels above the center of the game.
+poki_sdk.move_pill(50, -100)
+```
+
 ## Example
 
 [Refer to the example project](https://github.com/defold/extension-poki-sdk/blob/master/main/poki-sdk.gui_script) to see a complete exameple of how the intergation works.
@@ -163,4 +184,5 @@ poki_sdk.capture_error(error_string) -- in JS it's PokiSDK.captureError(error_st
 poki_sdk.shareable_url(params, callback) -- in JS it's PokiSDK.shareableURL({}).then(url => {})
 local value = poki_sdk.get_url_param(key) -- in JS it's PokiSDK.getURLParam('id')
 poki_sdk.measure(category, what, action) -- in JS it's PokiSDK.measure(category, what, action)
+poki_sdk.move_pill(topPercent, topPx) -- in JS it's PokiSDK.movePill(topPercent, topPx)
 ```
