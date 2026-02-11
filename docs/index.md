@@ -148,7 +148,7 @@ On mobile, you can reposition the Poki Pill slightly to better fit your game UI 
 
 You can't move the pill lower than 50% of the game area (the game bar at the bottom is not included in this area).
 
-The default position is `move_pill(0, 20)`.
+The default position is `move_pill(0, 24)`.
 
 **Poki Pill size**
 
