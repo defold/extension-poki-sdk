@@ -12,10 +12,13 @@ function init(self)
 	sound.play("#sound")
 end
 
-local function on_commercial_break_finished(self)
-	-- continue game
-	print("Comercial finished")
-	gui.set_text(gui.get_node("success"), "Comercial finished")
+local function on_commercial_break_finished(self, status)
+	if status == poki_sdk.COMMERCIAL_BREAK_START then
+		gui.set_text(gui.get_node("success"), "Commercial started")
+	elseif status == poki_sdk.COMMERCIAL_BREAK_SUCCESS then
+		-- continue game
+		gui.set_text(gui.get_node("success"), "Commercial finished")
+	end
 end
 
 local function on_rewarded_break_finished(self, status)

@@ -42,7 +42,13 @@ Commercial breaks are used to display video ads and should be triggered on natur
 
 ```lua
 -- gameplay stops
-poki_sdk.commercial_break(function(self)end)
+poki_sdk.commercial_break(function(self, status)
+  if status == poki_sdk.COMMERCIAL_BREAK_START then
+    print("Commercial break started, pause game")
+  elseif status == poki_sdk.COMMERCIAL_BREAK_SUCCESS then
+    print("Commercial break finished or did not happen")
+  end
+end)
 ```
 
 ### Important information about commercial breaks
@@ -59,7 +65,7 @@ poki_sdk.rewarded_break(function(self, status)
   if status == poki_sdk.REWARDED_BREAK_ERROR then
     print("Rewarded break error!")
   elseif status == poki_sdk.REWARDED_BREAK_START then
-    print("Rewarded break start")
+    print("Rewarded break started")
   elseif status == poki_sdk.REWARDED_BREAK_SUCCESS then
     print("Rewarded break success")
   end
@@ -73,21 +79,18 @@ Calling `poki_sdk.rewarded_break()` affects the timing of `poki_sdk.commercial_b
 
 ## Final steps
 
-### Disable sound and input during ads
+### Pause game and disable input during ads
 
-Make sure that audio and keyboard input are disabled during `commercial_break` and `rewarded_break`, so that the game doesn’t interfere with the ad:
+Make sure that the game is paused and keyboard inputs are disabled during `commercial_break` and `rewarded_break`, so that the game doesn’t interfere with the ad:
 
 ```lua
 -- gameplay stops
--- fire your mute audio function, for example:
-sound.pause("#music", true)
 poki_sdk.rewarded_break(function(self, status)
-  -- fire your unmute audio function, for example:
-  if status == poki_sdk.REWARDED_BREAK_ERROR or
-     status == poki_sdk.REWARDED_BREAK_SUCCESS then
-     sound.pause("#music", false)
+  if status == poki_sdk.REWARDED_BREAK_START then
+    print("Rewarded break start, pause game and disable input")
+  elseif status == poki_sdk.REWARDED_BREAK_ERROR or status == poki_sdk.REWARDED_BREAK_SUCCESS then
+    print("Rewarded break finished or did not happen, unpause game and enable input")
   end
-  -- fire your function to continue to game
 end)
 ```
 
@@ -177,8 +180,8 @@ The Poki SDK Lua API corresponds to original JS API SDK:
 ```lua
 poki_sdk.gameplay_start() -- in JS it's PokiSDK.gameplayStart()
 poki_sdk.gameplay_stop() -- in JS it's PokiSDK.gameplayStop()
-poki_sdk.commercial_break(function(self)end) -- in JS it's PokiSDK.commercialBreak()
-poki_sdk.rewarded_break(function(self, success)end) -- in JS it's PokiSDK.rewardedBreak()
+poki_sdk.commercial_break(function(self, status)end) -- in JS it's PokiSDK.commercialBreak()
+poki_sdk.rewarded_break(function(self, status)end) -- in JS it's PokiSDK.rewardedBreak()
 poki_sdk.set_debug(value) -- in JS it's PokiSDK.setDebug(value)
 poki_sdk.capture_error(error_string) -- in JS it's PokiSDK.captureError(error_string)
 poki_sdk.shareable_url(params, callback) -- in JS it's PokiSDK.shareableURL({}).then(url => {})

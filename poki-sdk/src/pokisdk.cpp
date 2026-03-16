@@ -16,6 +16,13 @@ enum PokiCallbackType
 };
 
 // make sure these match with the constants in lib_pokisdk.js
+enum PokiCommercialBreakResult
+{
+    COMMERCIAL_BREAK_SUCCESS = 1,
+    COMMERCIAL_BREAK_START = 2,
+};
+
+// make sure these match with the constants in lib_pokisdk.js
 enum PokiRewardedBreakResult
 {
     REWARDED_BREAK_ERROR = 0,
@@ -23,7 +30,7 @@ enum PokiRewardedBreakResult
     REWARDED_BREAK_START = 2,
 };
 
-typedef void (*CommercialBreakCallback)();
+typedef void (*CommercialBreakCallback)(PokiCommercialBreakResult result);
 typedef void (*RewardedBreakCallback)(PokiRewardedBreakResult result);
 typedef void (*ShareableURLCallback)(const char* url, int url_length);
 
@@ -94,6 +101,15 @@ static void PokiSdk_InvokeCallback(PokiCallbackType callbackType, int intArg, co
         lua_pushnumber(L, intArg);
         numOfArgs = 1;
     }
+    else if (callbackType == TYPE_INTERSTITIAL)
+    {
+        // do not destroy the callback if the event is COMMERCIAL_BREAK_START
+        // since we need to use the callback later when the event
+        // is COMMERCIAL_BREAK_SUCCESS
+        destroy_callback = (intArg != COMMERCIAL_BREAK_START);
+        lua_pushnumber(L, intArg);
+        numOfArgs = 1;
+    }
     else if (callbackType == TYPE_SHARABLE_URL)
     {
         lua_pushlstring(L, charArg, intArg);
@@ -118,10 +134,10 @@ static void PokiSdk_InvokeCallback(PokiCallbackType callbackType, int intArg, co
     }
 }
 
-static void PokiSdk_CommercialBreakCallback()
+static void PokiSdk_CommercialBreakCallback(PokiCommercialBreakResult result)
 {
     dmSound::SetGroupMute(MASTER_SOUND_GROUP, true);
-    PokiSdk_InvokeCallback(TYPE_INTERSTITIAL, 0, 0);
+    PokiSdk_InvokeCallback(TYPE_INTERSTITIAL, result, 0);
 }
 
 static void PokiSdk_RewardedBreakCallback(PokiRewardedBreakResult result)
@@ -320,6 +336,9 @@ static void LuaInit(lua_State* L)
     int top = lua_gettop(L);
 
     luaL_register(L, MODULE_NAME, Module_methods);
+
+    SETCONSTANT(COMMERCIAL_BREAK_SUCCESS, COMMERCIAL_BREAK_SUCCESS);
+    SETCONSTANT(COMMERCIAL_BREAK_START, COMMERCIAL_BREAK_START);
 
     SETCONSTANT(REWARDED_BREAK_ERROR, REWARDED_BREAK_ERROR);
     SETCONSTANT(REWARDED_BREAK_SUCCESS, REWARDED_BREAK_SUCCESS);
