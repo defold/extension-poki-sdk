@@ -23,6 +23,17 @@
     - name: callback
       type: function
 
+      parameters:
+        - name: self
+          type: object
+          desc: The calling script instance
+
+        - name: status
+          type: number
+          desc: "One of the statuses:
+               `poki_sdk.COMMERCIAL_BREAK_START`,
+               `poki_sdk.COMMERCIAL_BREAK_SUCCESS`"
+
 #*****************************************************************************************************
 
   - name: rewarded_break
@@ -114,6 +125,13 @@
       type: number
     - name: topPx
       type: number
+
+#*****************************************************************************************************
+
+  - name: COMMERCIAL_BREAK_SUCCESS
+    type: number
+  - name: COMMERCIAL_BREAK_START
+    type: number
 
 #*****************************************************************************************************
 

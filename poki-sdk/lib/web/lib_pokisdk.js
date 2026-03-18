@@ -3,6 +3,9 @@
 var LibPokiSdk = {
 
     $PokiSdk: {
+        // must match PokiCommercialBreakResult
+        COMMERCIAL_BREAK_SUCCESS: 1,
+        COMMERCIAL_BREAK_START: 2,
 
         // must match PokiRewardedBreakResult
         REWARDED_BREAK_ERROR: 0,
@@ -15,7 +18,13 @@ var LibPokiSdk = {
         _messagesHashTable: {},
 
         _commercialBreakCallback: function() {
-            {{{ makeDynCall("v", "PokiSdk._callback")}}}();
+            var msg = PokiSdk.COMMERCIAL_BREAK_SUCCESS;
+            {{{ makeDynCall("vi", "PokiSdk._callback")}}}(msg);
+        },
+
+        _commercialBreakStartedCallback: function() {
+            var msg = PokiSdk.COMMERCIAL_BREAK_START;
+            {{{ makeDynCall("vi", "PokiSdk._callback")}}}(msg);
         },
 
         _rewardedBreakCallback: function(success) {
@@ -37,7 +46,7 @@ var LibPokiSdk = {
 
     PokiSdkJs_CommercialBreak: function(callback) {
         PokiSdk._callback = callback;
-        PokiSDK.commercialBreak().then(PokiSdk._commercialBreakCallback);
+        PokiSDK.commercialBreak(PokiSdk._commercialBreakStartedCallback).then(PokiSdk._commercialBreakCallback);
     },
 
     PokiSdkJs_RewardedBreak: function(size, callback) {
