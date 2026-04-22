@@ -115,6 +115,10 @@ var LibPokiSdk = {
     PokiSdkJs_MovePill: function(topPercent, topPx) {
         PokiSDK.movePill(topPercent, topPx);
     },
+
+    PokiSdkJs_OpenExternalLink: function(url) {
+        PokiSDK.openExternalLink(UTF8ToString(url));
+    },
 }
 
 autoAddDeps(LibPokiSdk, '$PokiSdk');
