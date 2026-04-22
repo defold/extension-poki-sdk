@@ -16,6 +16,12 @@ var LibPokiSdk = {
         _urlCallback: null,
         _urlParameters:null,
         _messagesHashTable: {},
+        _userCallback: null,
+        _userErrorCallback: null,
+        _tokenCallback: null,
+        _tokenErrorCallback: null,
+        _loginCallback: null,
+        _loginErrorCallback: null,
 
         _commercialBreakCallback: function() {
             var msg = PokiSdk.COMMERCIAL_BREAK_SUCCESS;
@@ -28,12 +34,12 @@ var LibPokiSdk = {
         },
 
         _rewardedBreakCallback: function(success) {
-            var msg = success ? PokiSdk.REWARDED_BREAK_SUCCESS : PokiSdk.REWARDED_BREAK_ERROR; 
+            var msg = success ? PokiSdk.REWARDED_BREAK_SUCCESS : PokiSdk.REWARDED_BREAK_ERROR;
             {{{ makeDynCall("vi", "PokiSdk._callback")}}}(msg);
         },
 
         _rewardedBreakStartedCallback: function() {
-            var msg = PokiSdk.REWARDED_BREAK_START; 
+            var msg = PokiSdk.REWARDED_BREAK_START;
             {{{ makeDynCall("vi", "PokiSdk._callback")}}}(msg);
         },
 
@@ -41,7 +47,58 @@ var LibPokiSdk = {
             var _url = stringToNewUTF8(url);
             {{{ makeDynCall("vii", "PokiSdk._urlCallback")}}}(_url, lengthBytesUTF8(url));
             Module._free(_url);
-        }
+        },
+
+        _getUserCallback: function(user) {
+            if (user == null) {
+                {{{ makeDynCall("viiiii", "PokiSdk._userCallback")}}}(0, 0, 0, 0, 0);
+                return;
+            }
+
+            var username = user.username != null ? user.username : "";
+            var avatarUrl = user.avatarUrl != null ? user.avatarUrl : "";
+            var _username = stringToNewUTF8(username);
+            var _avatarUrl = stringToNewUTF8(avatarUrl);
+            {{{ makeDynCall("viiiii", "PokiSdk._userCallback")}}}(1, _username, lengthBytesUTF8(username), _avatarUrl, lengthBytesUTF8(avatarUrl));
+            Module._free(_username);
+            Module._free(_avatarUrl);
+        },
+
+        _getUserErrorCallback: function(error) {
+            var jsError = error && typeof error.message === "string" ? error.message : String(error);
+            var _error = stringToNewUTF8(jsError);
+            {{{ makeDynCall("vii", "PokiSdk._userErrorCallback")}}}(_error, lengthBytesUTF8(jsError));
+            Module._free(_error);
+        },
+
+        _getTokenCallback: function(token) {
+            if (token == null) {
+                {{{ makeDynCall("viii", "PokiSdk._tokenCallback")}}}(0, 0, 0);
+                return;
+            }
+
+            var _token = stringToNewUTF8(token);
+            {{{ makeDynCall("viii", "PokiSdk._tokenCallback")}}}(1, _token, lengthBytesUTF8(token));
+            Module._free(_token);
+        },
+
+        _getTokenErrorCallback: function(error) {
+            var jsError = error && typeof error.message === "string" ? error.message : String(error);
+            var _error = stringToNewUTF8(jsError);
+            {{{ makeDynCall("vii", "PokiSdk._tokenErrorCallback")}}}(_error, lengthBytesUTF8(jsError));
+            Module._free(_error);
+        },
+
+        _loginSuccessCallback: function() {
+            {{{ makeDynCall("v", "PokiSdk._loginCallback")}}}();
+        },
+
+        _loginFailureCallback: function(error) {
+            var jsError = error && typeof error.message === "string" ? error.message : String(error);
+            var _error = stringToNewUTF8(jsError);
+            {{{ makeDynCall("vii", "PokiSdk._loginErrorCallback")}}}(_error, lengthBytesUTF8(jsError));
+            Module._free(_error);
+        },
     },
 
     PokiSdkJs_CommercialBreak: function(callback) {
@@ -114,6 +171,24 @@ var LibPokiSdk = {
 
     PokiSdkJs_MovePill: function(topPercent, topPx) {
         PokiSDK.movePill(topPercent, topPx);
+    },
+
+    PokiSdkJs_GetUser: function(callback, error_callback) {
+        PokiSdk._userCallback = callback;
+        PokiSdk._userErrorCallback = error_callback;
+        PokiSDK.getUser().then(PokiSdk._getUserCallback).catch(PokiSdk._getUserErrorCallback);
+    },
+
+    PokiSdkJs_GetToken: function(callback, error_callback) {
+        PokiSdk._tokenCallback = callback;
+        PokiSdk._tokenErrorCallback = error_callback;
+        PokiSDK.getToken().then(PokiSdk._getTokenCallback).catch(PokiSdk._getTokenErrorCallback);
+    },
+
+    PokiSdkJs_Login: function(callback, error_callback) {
+        PokiSdk._loginCallback = callback;
+        PokiSdk._loginErrorCallback = error_callback;
+        PokiSDK.login().then(PokiSdk._loginSuccessCallback).catch(PokiSdk._loginFailureCallback);
     },
 }
 

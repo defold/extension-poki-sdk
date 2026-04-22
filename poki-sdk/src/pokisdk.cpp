@@ -8,11 +8,15 @@
 
 static const dmhash_t MASTER_SOUND_GROUP = dmHashString64("master");
 
-enum PokiCallbackType
+enum PokiCallbackSlot
 {
-    TYPE_INTERSTITIAL,
-    TYPE_REWARDED,
-    TYPE_SHARABLE_URL
+    CALLBACK_SLOT_COMMERCIAL_BREAK = 0,
+    CALLBACK_SLOT_REWARDED_BREAK,
+    CALLBACK_SLOT_SHAREABLE_URL,
+    CALLBACK_SLOT_GET_USER,
+    CALLBACK_SLOT_GET_TOKEN,
+    CALLBACK_SLOT_LOGIN,
+    CALLBACK_SLOT_COUNT
 };
 
 // make sure these match with the constants in lib_pokisdk.js
@@ -33,6 +37,10 @@ enum PokiRewardedBreakResult
 typedef void (*CommercialBreakCallback)(PokiCommercialBreakResult result);
 typedef void (*RewardedBreakCallback)(PokiRewardedBreakResult result);
 typedef void (*ShareableURLCallback)(const char* url, int url_length);
+typedef void (*GetUserCallback)(int has_user, const char* username, int username_length, const char* avatar_url, int avatar_url_length);
+typedef void (*GetTokenCallback)(int has_token, const char* token, int token_length);
+typedef void (*LoginSuccessCallback)();
+typedef void (*AsyncErrorCallback)(const char* error, int error_length);
 
 extern "C" {
     void PokiSdkJs_GameplayStart();
@@ -53,9 +61,13 @@ extern "C" {
     void PokiSdkJs_Measure(const char* category, const char* what, const char* action);
 
     void PokiSdkJs_MovePill(double topPercent, double topPx);
+
+    void PokiSdkJs_GetUser(GetUserCallback callback, AsyncErrorCallback error_callback);
+    void PokiSdkJs_GetToken(GetTokenCallback callback, AsyncErrorCallback error_callback);
+    void PokiSdkJs_Login(LoginSuccessCallback callback, AsyncErrorCallback error_callback);
 }
 
-static dmScript::LuaCallbackInfo* pokiSdk_Callback = 0x0;
+static dmScript::LuaCallbackInfo* pokiSdk_Callbacks[CALLBACK_SLOT_COUNT] = {0x0};
 
 static bool PokiSdk_luaL_checkbool(lua_State *L, int numArg)
 {
@@ -71,84 +83,342 @@ static bool PokiSdk_luaL_checkbool(lua_State *L, int numArg)
     return b;
 }
 
-static void PokiSdk_InvokeCallback(PokiCallbackType callbackType, int intArg, const char* charArg)
+static const char* PokiSdk_GetCallbackName(PokiCallbackSlot slot)
 {
-    if (!dmScript::IsCallbackValid(pokiSdk_Callback))
+    switch (slot)
     {
-        dmLogError("PokiSDK InvokeCallback callback is invalid. Use callback function as an argument when showing ads.");
+        case CALLBACK_SLOT_COMMERCIAL_BREAK:
+            return "commercial_break";
+        case CALLBACK_SLOT_REWARDED_BREAK:
+            return "rewarded_break";
+        case CALLBACK_SLOT_SHAREABLE_URL:
+            return "shareable_url";
+        case CALLBACK_SLOT_GET_USER:
+            return "get_user";
+        case CALLBACK_SLOT_GET_TOKEN:
+            return "get_token";
+        case CALLBACK_SLOT_LOGIN:
+            return "login";
+        case CALLBACK_SLOT_COUNT:
+        default:
+            return "unknown";
+    }
+}
+
+static void PokiSdk_DestroyCallback(PokiCallbackSlot slot)
+{
+    if (pokiSdk_Callbacks[slot] != 0x0)
+    {
+        dmScript::DestroyCallback(pokiSdk_Callbacks[slot]);
+        pokiSdk_Callbacks[slot] = 0x0;
+    }
+}
+
+static void PokiSdk_SetCallback(lua_State* L, int index, PokiCallbackSlot slot, const char* invalid_message)
+{
+    if (lua_type(L, index) != LUA_TFUNCTION)
+    {
+        luaL_error(L, "%s", invalid_message);
         return;
     }
 
-    lua_State* L = dmScript::GetCallbackLuaContext(pokiSdk_Callback);
-
-    DM_LUA_STACK_CHECK(L, 0);
-
-    if (!dmScript::SetupCallback(pokiSdk_Callback))
+    if (pokiSdk_Callbacks[slot] != 0x0)
     {
-        return;
+        dmLogError("PokiSDK %s callback already exists. Replacing pending callback.", PokiSdk_GetCallbackName(slot));
+        PokiSdk_DestroyCallback(slot);
     }
 
-    int numOfArgs = 0;
+    pokiSdk_Callbacks[slot] = dmScript::CreateCallback(L, index);
+}
 
-    bool destroy_callback = true;
-
-    if (callbackType == TYPE_REWARDED)
+static dmScript::LuaCallbackInfo* PokiSdk_GetValidCallback(PokiCallbackSlot slot)
+{
+    dmScript::LuaCallbackInfo* callback = pokiSdk_Callbacks[slot];
+    if (!dmScript::IsCallbackValid(callback))
     {
-        // do not destroy the callback if the event is REWARDED_BREAK_START
-        // since we need to use the callback later when the event
-        // is REWARDED_BREAK_SUCCESS
-        destroy_callback = (intArg != REWARDED_BREAK_START);
-        lua_pushnumber(L, intArg);
-        numOfArgs = 1;
+        dmLogError("PokiSDK %s callback is invalid.", PokiSdk_GetCallbackName(slot));
+        PokiSdk_DestroyCallback(slot);
+        return 0x0;
     }
-    else if (callbackType == TYPE_INTERSTITIAL)
-    {
-        // do not destroy the callback if the event is COMMERCIAL_BREAK_START
-        // since we need to use the callback later when the event
-        // is COMMERCIAL_BREAK_SUCCESS
-        destroy_callback = (intArg != COMMERCIAL_BREAK_START);
-        lua_pushnumber(L, intArg);
-        numOfArgs = 1;
-    }
-    else if (callbackType == TYPE_SHARABLE_URL)
-    {
-        lua_pushlstring(L, charArg, intArg);
-        numOfArgs = 1;
-    }
-    numOfArgs += 1;
-
-    if ((pokiSdk_Callback != 0x0) && destroy_callback)
-    {
-        dmSound::SetGroupMute(MASTER_SOUND_GROUP, false);
-    }
-
-    int ret = dmScript::PCall(L, numOfArgs, 0);
-    (void)ret;
-
-    dmScript::TeardownCallback(pokiSdk_Callback);
-
-    if ((pokiSdk_Callback != 0x0) && destroy_callback)
-    {
-        dmScript::DestroyCallback(pokiSdk_Callback);
-        pokiSdk_Callback = 0x0;
-    }
+    return callback;
 }
 
 static void PokiSdk_CommercialBreakCallback(PokiCommercialBreakResult result)
 {
     dmSound::SetGroupMute(MASTER_SOUND_GROUP, true);
-    PokiSdk_InvokeCallback(TYPE_INTERSTITIAL, result, 0);
+
+    dmScript::LuaCallbackInfo* callback = PokiSdk_GetValidCallback(CALLBACK_SLOT_COMMERCIAL_BREAK);
+    if (callback == 0x0)
+    {
+        return;
+    }
+
+    lua_State* L = dmScript::GetCallbackLuaContext(callback);
+    DM_LUA_STACK_CHECK(L, 0);
+
+    if (!dmScript::SetupCallback(callback))
+    {
+        return;
+    }
+
+    bool destroy_callback = (result != COMMERCIAL_BREAK_START);
+    lua_pushnumber(L, result);
+
+    if (destroy_callback)
+    {
+        dmSound::SetGroupMute(MASTER_SOUND_GROUP, false);
+    }
+
+    int ret = dmScript::PCall(L, 2, 0);
+    (void)ret;
+
+    dmScript::TeardownCallback(callback);
+    if (destroy_callback)
+    {
+        PokiSdk_DestroyCallback(CALLBACK_SLOT_COMMERCIAL_BREAK);
+    }
 }
 
 static void PokiSdk_RewardedBreakCallback(PokiRewardedBreakResult result)
 {
     dmSound::SetGroupMute(MASTER_SOUND_GROUP, true);
-    PokiSdk_InvokeCallback(TYPE_REWARDED, result, 0);
+
+    dmScript::LuaCallbackInfo* callback = PokiSdk_GetValidCallback(CALLBACK_SLOT_REWARDED_BREAK);
+    if (callback == 0x0)
+    {
+        return;
+    }
+
+    lua_State* L = dmScript::GetCallbackLuaContext(callback);
+    DM_LUA_STACK_CHECK(L, 0);
+
+    if (!dmScript::SetupCallback(callback))
+    {
+        return;
+    }
+
+    bool destroy_callback = (result != REWARDED_BREAK_START);
+    lua_pushnumber(L, result);
+
+    if (destroy_callback)
+    {
+        dmSound::SetGroupMute(MASTER_SOUND_GROUP, false);
+    }
+
+    int ret = dmScript::PCall(L, 2, 0);
+    (void)ret;
+
+    dmScript::TeardownCallback(callback);
+    if (destroy_callback)
+    {
+        PokiSdk_DestroyCallback(CALLBACK_SLOT_REWARDED_BREAK);
+    }
 }
 
 static void PokiSdk_ShareableURLCallback(const char* url, int url_length)
 {
-    PokiSdk_InvokeCallback(TYPE_SHARABLE_URL, url_length, url);
+    dmScript::LuaCallbackInfo* callback = PokiSdk_GetValidCallback(CALLBACK_SLOT_SHAREABLE_URL);
+    if (callback == 0x0)
+    {
+        return;
+    }
+
+    lua_State* L = dmScript::GetCallbackLuaContext(callback);
+    DM_LUA_STACK_CHECK(L, 0);
+
+    if (!dmScript::SetupCallback(callback))
+    {
+        return;
+    }
+
+    lua_pushlstring(L, url, url_length);
+
+    int ret = dmScript::PCall(L, 2, 0);
+    (void)ret;
+
+    dmScript::TeardownCallback(callback);
+    PokiSdk_DestroyCallback(CALLBACK_SLOT_SHAREABLE_URL);
+}
+
+static void PokiSdk_PushUser(lua_State* L, const char* username, int username_length, const char* avatar_url, int avatar_url_length)
+{
+    lua_createtable(L, 0, 2);
+
+    lua_pushlstring(L, username, username_length);
+    lua_setfield(L, -2, "username");
+
+    lua_pushlstring(L, avatar_url, avatar_url_length);
+    lua_setfield(L, -2, "avatar_url");
+}
+
+static void PokiSdk_GetUserCallback(int has_user, const char* username, int username_length, const char* avatar_url, int avatar_url_length)
+{
+    dmScript::LuaCallbackInfo* callback = PokiSdk_GetValidCallback(CALLBACK_SLOT_GET_USER);
+    if (callback == 0x0)
+    {
+        return;
+    }
+
+    lua_State* L = dmScript::GetCallbackLuaContext(callback);
+    DM_LUA_STACK_CHECK(L, 0);
+
+    if (!dmScript::SetupCallback(callback))
+    {
+        return;
+    }
+
+    if (has_user)
+    {
+        PokiSdk_PushUser(L, username, username_length, avatar_url, avatar_url_length);
+    }
+    else
+    {
+        lua_pushnil(L);
+    }
+    lua_pushnil(L);
+
+    int ret = dmScript::PCall(L, 3, 0);
+    (void)ret;
+
+    dmScript::TeardownCallback(callback);
+    PokiSdk_DestroyCallback(CALLBACK_SLOT_GET_USER);
+}
+
+static void PokiSdk_GetUserErrorCallback(const char* error, int error_length)
+{
+    dmScript::LuaCallbackInfo* callback = PokiSdk_GetValidCallback(CALLBACK_SLOT_GET_USER);
+    if (callback == 0x0)
+    {
+        return;
+    }
+
+    lua_State* L = dmScript::GetCallbackLuaContext(callback);
+    DM_LUA_STACK_CHECK(L, 0);
+
+    if (!dmScript::SetupCallback(callback))
+    {
+        return;
+    }
+
+    lua_pushnil(L);
+    lua_pushlstring(L, error, error_length);
+
+    int ret = dmScript::PCall(L, 3, 0);
+    (void)ret;
+
+    dmScript::TeardownCallback(callback);
+    PokiSdk_DestroyCallback(CALLBACK_SLOT_GET_USER);
+}
+
+static void PokiSdk_GetTokenCallback(int has_token, const char* token, int token_length)
+{
+    dmScript::LuaCallbackInfo* callback = PokiSdk_GetValidCallback(CALLBACK_SLOT_GET_TOKEN);
+    if (callback == 0x0)
+    {
+        return;
+    }
+
+    lua_State* L = dmScript::GetCallbackLuaContext(callback);
+    DM_LUA_STACK_CHECK(L, 0);
+
+    if (!dmScript::SetupCallback(callback))
+    {
+        return;
+    }
+
+    if (has_token)
+    {
+        lua_pushlstring(L, token, token_length);
+    }
+    else
+    {
+        lua_pushnil(L);
+    }
+    lua_pushnil(L);
+
+    int ret = dmScript::PCall(L, 3, 0);
+    (void)ret;
+
+    dmScript::TeardownCallback(callback);
+    PokiSdk_DestroyCallback(CALLBACK_SLOT_GET_TOKEN);
+}
+
+static void PokiSdk_GetTokenErrorCallback(const char* error, int error_length)
+{
+    dmScript::LuaCallbackInfo* callback = PokiSdk_GetValidCallback(CALLBACK_SLOT_GET_TOKEN);
+    if (callback == 0x0)
+    {
+        return;
+    }
+
+    lua_State* L = dmScript::GetCallbackLuaContext(callback);
+    DM_LUA_STACK_CHECK(L, 0);
+
+    if (!dmScript::SetupCallback(callback))
+    {
+        return;
+    }
+
+    lua_pushnil(L);
+    lua_pushlstring(L, error, error_length);
+
+    int ret = dmScript::PCall(L, 3, 0);
+    (void)ret;
+
+    dmScript::TeardownCallback(callback);
+    PokiSdk_DestroyCallback(CALLBACK_SLOT_GET_TOKEN);
+}
+
+static void PokiSdk_LoginCallback()
+{
+    dmScript::LuaCallbackInfo* callback = PokiSdk_GetValidCallback(CALLBACK_SLOT_LOGIN);
+    if (callback == 0x0)
+    {
+        return;
+    }
+
+    lua_State* L = dmScript::GetCallbackLuaContext(callback);
+    DM_LUA_STACK_CHECK(L, 0);
+
+    if (!dmScript::SetupCallback(callback))
+    {
+        return;
+    }
+
+    lua_pushboolean(L, true);
+    lua_pushnil(L);
+
+    int ret = dmScript::PCall(L, 3, 0);
+    (void)ret;
+
+    dmScript::TeardownCallback(callback);
+    PokiSdk_DestroyCallback(CALLBACK_SLOT_LOGIN);
+}
+
+static void PokiSdk_LoginErrorCallback(const char* error, int error_length)
+{
+    dmScript::LuaCallbackInfo* callback = PokiSdk_GetValidCallback(CALLBACK_SLOT_LOGIN);
+    if (callback == 0x0)
+    {
+        return;
+    }
+
+    lua_State* L = dmScript::GetCallbackLuaContext(callback);
+    DM_LUA_STACK_CHECK(L, 0);
+
+    if (!dmScript::SetupCallback(callback))
+    {
+        return;
+    }
+
+    lua_pushboolean(L, false);
+    lua_pushlstring(L, error, error_length);
+
+    int ret = dmScript::PCall(L, 3, 0);
+    (void)ret;
+
+    dmScript::TeardownCallback(callback);
+    PokiSdk_DestroyCallback(CALLBACK_SLOT_LOGIN);
 }
 
 static int PokiSdk_GameplayStart(lua_State* L)
@@ -167,35 +437,15 @@ static int PokiSdk_GameplayStop(lua_State* L)
 
 static int PokiSdk_CommercialBreak(lua_State* L)
 {
-    int type = lua_type(L, 1);
-    if (type != LUA_TFUNCTION)
-    {
-        luaL_error(L, "PokiSDK CommercialBreak callback is invalid. Use callback function as an argument when showing ads.");
-        return 0;
-    }
-    if (pokiSdk_Callback != 0x0)
-    {
-        dmLogError("PokiSdk_CommercialBreak PokiSDK callback already exist. Rewrite callback");
-    }
     DM_LUA_STACK_CHECK(L, 0);
-    pokiSdk_Callback = dmScript::CreateCallback(L, 1);
+    PokiSdk_SetCallback(L, 1, CALLBACK_SLOT_COMMERCIAL_BREAK, "PokiSDK CommercialBreak callback is invalid. Use callback function as an argument when showing ads.");
     PokiSdkJs_CommercialBreak((CommercialBreakCallback)PokiSdk_CommercialBreakCallback);
     return 0;
 }
 
 static void PokiSdk_SetRewardedBreakCallback(lua_State* L, int index)
 {
-    if (lua_type(L, index) != LUA_TFUNCTION)
-    {
-        luaL_error(L, "PokiSDK RewardedBreak callback is invalid. Use callback function as an argument when showing ads.");
-        return;
-    }
-
-    if (pokiSdk_Callback != 0x0)
-    {
-        dmLogError("PokiSdk_RewardedBreak PokiSDK callback already exist. Rewrite callback");
-    }
-    pokiSdk_Callback = dmScript::CreateCallback(L, index);
+    PokiSdk_SetCallback(L, index, CALLBACK_SLOT_REWARDED_BREAK, "PokiSDK RewardedBreak callback is invalid. Use callback function as an argument when showing ads.");
 }
 
 static int PokiSdk_RewardedBreak(lua_State* L)
@@ -261,14 +511,8 @@ static int PokiSdk_ShareableURL(lua_State* L)
     }
     lua_pop(L, 1);
     
-    type = lua_type(L, 2);
-    if (type != LUA_TFUNCTION)
-    {
-        luaL_error(L, "PokiSDK callback is invalid. The second argument should be a callback function.");
-        return 0;
-    }
     DM_LUA_STACK_CHECK(L, 0);
-    pokiSdk_Callback = dmScript::CreateCallback(L, 2);
+    PokiSdk_SetCallback(L, 2, CALLBACK_SLOT_SHAREABLE_URL, "PokiSDK callback is invalid. The second argument should be a callback function.");
     PokiSdkJs_ShareableURL((ShareableURLCallback)PokiSdk_ShareableURLCallback);
     return 0;
 }
@@ -310,6 +554,30 @@ static int PokiSdk_MovePill(lua_State* L)
     return 0;
 }
 
+static int PokiSdk_GetUser(lua_State* L)
+{
+    DM_LUA_STACK_CHECK(L, 0);
+    PokiSdk_SetCallback(L, 1, CALLBACK_SLOT_GET_USER, "PokiSDK get_user callback is invalid. The first argument should be a callback function.");
+    PokiSdkJs_GetUser((GetUserCallback)PokiSdk_GetUserCallback, (AsyncErrorCallback)PokiSdk_GetUserErrorCallback);
+    return 0;
+}
+
+static int PokiSdk_GetToken(lua_State* L)
+{
+    DM_LUA_STACK_CHECK(L, 0);
+    PokiSdk_SetCallback(L, 1, CALLBACK_SLOT_GET_TOKEN, "PokiSDK get_token callback is invalid. The first argument should be a callback function.");
+    PokiSdkJs_GetToken((GetTokenCallback)PokiSdk_GetTokenCallback, (AsyncErrorCallback)PokiSdk_GetTokenErrorCallback);
+    return 0;
+}
+
+static int PokiSdk_Login(lua_State* L)
+{
+    DM_LUA_STACK_CHECK(L, 0);
+    PokiSdk_SetCallback(L, 1, CALLBACK_SLOT_LOGIN, "PokiSDK login callback is invalid. The first argument should be a callback function.");
+    PokiSdkJs_Login((LoginSuccessCallback)PokiSdk_LoginCallback, (AsyncErrorCallback)PokiSdk_LoginErrorCallback);
+    return 0;
+}
+
 // Functions exposed to Lua
 static const luaL_reg Module_methods[] =
 {
@@ -324,6 +592,9 @@ static const luaL_reg Module_methods[] =
     {"get_url_param", PokiSdk_GetURLParam},
     {"measure", PokiSdk_Measure},
     {"move_pill", PokiSdk_MovePill},
+    {"get_user", PokiSdk_GetUser},
+    {"get_token", PokiSdk_GetToken},
+    {"login", PokiSdk_Login},
     {0, 0}
 };
 

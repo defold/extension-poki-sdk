@@ -128,6 +128,66 @@
 
 #*****************************************************************************************************
 
+  - name: get_user
+    type: function
+
+    parameters:
+    - name: callback
+      type: function
+
+      parameters:
+        - name: self
+          type: object
+          desc: The calling script instance
+        - name: user
+          type: table
+          desc: A table with the fields `username` and `avatar_url`, or `nil` if no user is logged in.
+        - name: error
+          type: string
+          desc: The rejection message if user accounts are unavailable, or `nil` otherwise.
+
+#*****************************************************************************************************
+
+  - name: get_token
+    type: function
+
+    parameters:
+    - name: callback
+      type: function
+
+      parameters:
+        - name: self
+          type: object
+          desc: The calling script instance
+        - name: token
+          type: string
+          desc: The Poki auth token, or `nil` if no user is logged in.
+        - name: error
+          type: string
+          desc: The rejection message if user accounts are unavailable, or `nil` otherwise.
+
+#*****************************************************************************************************
+
+  - name: login
+    type: function
+
+    parameters:
+    - name: callback
+      type: function
+
+      parameters:
+        - name: self
+          type: object
+          desc: The calling script instance
+        - name: success
+          type: boolean
+          desc: `true` if the login promise resolved, otherwise `false`.
+        - name: error
+          type: string
+          desc: The rejection message on failure, or `nil` on success.
+
+#*****************************************************************************************************
+
   - name: COMMERCIAL_BREAK_SUCCESS
     type: number
   - name: COMMERCIAL_BREAK_START
