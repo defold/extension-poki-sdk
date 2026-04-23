@@ -128,6 +128,22 @@
 
 #*****************************************************************************************************
 
+  - name: open_external_link
+    type: function
+
+    parameters:
+    - name: url
+      type: string
+
+  - name: openExternalLink
+    type: function
+
+    parameters:
+    - name: url
+      type: string
+
+#*****************************************************************************************************
+
   - name: COMMERCIAL_BREAK_SUCCESS
     type: number
   - name: COMMERCIAL_BREAK_START

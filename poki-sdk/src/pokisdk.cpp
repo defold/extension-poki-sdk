@@ -53,6 +53,7 @@ extern "C" {
     void PokiSdkJs_Measure(const char* category, const char* what, const char* action);
 
     void PokiSdkJs_MovePill(double topPercent, double topPx);
+    void PokiSdkJs_OpenExternalLink(const char* url);
 }
 
 static dmScript::LuaCallbackInfo* pokiSdk_Callback = 0x0;
@@ -310,6 +311,14 @@ static int PokiSdk_MovePill(lua_State* L)
     return 0;
 }
 
+static int PokiSdk_OpenExternalLink(lua_State* L)
+{
+    DM_LUA_STACK_CHECK(L, 0);
+    const char* url = luaL_checkstring(L, 1);
+    PokiSdkJs_OpenExternalLink(url);
+    return 0;
+}
+
 // Functions exposed to Lua
 static const luaL_reg Module_methods[] =
 {
@@ -324,6 +333,7 @@ static const luaL_reg Module_methods[] =
     {"get_url_param", PokiSdk_GetURLParam},
     {"measure", PokiSdk_Measure},
     {"move_pill", PokiSdk_MovePill},
+    {"open_external_link", PokiSdk_OpenExternalLink},
     {0, 0}
 };
 
