@@ -334,7 +334,6 @@ static const luaL_reg Module_methods[] =
     {"measure", PokiSdk_Measure},
     {"move_pill", PokiSdk_MovePill},
     {"open_external_link", PokiSdk_OpenExternalLink},
-    {"openExternalLink", PokiSdk_OpenExternalLink},
     {0, 0}
 };
 
