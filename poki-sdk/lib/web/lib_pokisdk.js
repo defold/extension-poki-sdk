@@ -190,6 +190,10 @@ var LibPokiSdk = {
         PokiSdk._loginErrorCallback = error_callback;
         PokiSDK.login().then(PokiSdk._loginSuccessCallback).catch(PokiSdk._loginFailureCallback);
     },
+
+    PokiSdkJs_OpenExternalLink: function(url) {
+        PokiSDK.openExternalLink(UTF8ToString(url));
+    }
 }
 
 autoAddDeps(LibPokiSdk, '$PokiSdk');

@@ -187,6 +187,15 @@
           desc: The rejection message on failure, or `nil` on success.
 
 #*****************************************************************************************************
+  
+  - name: open_external_link
+    type: function
+
+    parameters:
+    - name: url
+      type: string
+
+#*****************************************************************************************************
 
   - name: COMMERCIAL_BREAK_SUCCESS
     type: number

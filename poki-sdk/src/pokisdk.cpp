@@ -59,6 +59,7 @@ extern "C" {
     const char* PokiSdkJs_GetURLParam(const char* key);
 
     void PokiSdkJs_Measure(const char* category, const char* what, const char* action);
+    void PokiSdkJs_OpenExternalLink(const char* url);
 
     void PokiSdkJs_MovePill(double topPercent, double topPx);
 
@@ -575,6 +576,13 @@ static int PokiSdk_Login(lua_State* L)
     DM_LUA_STACK_CHECK(L, 0);
     PokiSdk_SetCallback(L, 1, CALLBACK_SLOT_LOGIN, "PokiSDK login callback is invalid. The first argument should be a callback function.");
     PokiSdkJs_Login((LoginSuccessCallback)PokiSdk_LoginCallback, (AsyncErrorCallback)PokiSdk_LoginErrorCallback);
+}
+
+static int PokiSdk_OpenExternalLink(lua_State* L)
+{
+    DM_LUA_STACK_CHECK(L, 0);
+    const char* url = luaL_checkstring(L, 1);
+    PokiSdkJs_OpenExternalLink(url);
     return 0;
 }
 
@@ -595,6 +603,7 @@ static const luaL_reg Module_methods[] =
     {"get_user", PokiSdk_GetUser},
     {"get_token", PokiSdk_GetToken},
     {"login", PokiSdk_Login},
+    {"open_external_link", PokiSdk_OpenExternalLink},
     {0, 0}
 };
 
