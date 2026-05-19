@@ -100,7 +100,7 @@
     
     return:
     - name: value
-      type: string
+      type: string|nil
 
 #*****************************************************************************************************
 
@@ -181,7 +181,7 @@
           desc: The calling script instance
         - name: success
           type: boolean
-          desc: `true` if the login promise resolved, otherwise `false`.
+          desc: "`true` if the login promise resolved, otherwise `false`."
         - name: error
           type: string
           desc: The rejection message on failure, or `nil` on success.

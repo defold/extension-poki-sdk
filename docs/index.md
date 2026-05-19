@@ -187,7 +187,7 @@ Use `poki_sdk.login()` only in response to a user action that requires an accoun
 
 ## Example
 
-[Refer to the example project](https://github.com/defold/extension-poki-sdk/blob/master/main/poki-sdk.gui_script) to see a complete example of how the intergation works.
+[Refer to the example project](https://github.com/defold/extension-poki-sdk/blob/main/example/poki-sdk.gui_script) to see a complete example of how the integration works.
 
 
 ## Source code
@@ -213,4 +213,5 @@ poki_sdk.move_pill(topPercent, topPx) -- in JS it's PokiSDK.movePill(topPercent,
 poki_sdk.get_user(callback) -- in JS it's PokiSDK.getUser().then(user => {})
 poki_sdk.get_token(callback) -- in JS it's PokiSDK.getToken().then(token => {})
 poki_sdk.login(callback) -- in JS it's PokiSDK.login().then(() => {})
+poki_sdk.open_external_link(url) -- in JS it's PokiSDK.openExternalLink(url)
 ```
