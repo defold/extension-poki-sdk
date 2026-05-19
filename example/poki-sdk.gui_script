@@ -73,9 +73,11 @@ end
 
 local function on_commercial_break_finished(self, status)
 	if status == poki_sdk.COMMERCIAL_BREAK_START then
+		print("COMMERCIAL_BREAK_START")
 		gui.set_text(gui.get_node("success"), "Commercial started")
 	elseif status == poki_sdk.COMMERCIAL_BREAK_SUCCESS then
 		-- continue game
+		print("COMMERCIAL_BREAK_SUCCESS")
 		gui.set_text(gui.get_node("success"), "Commercial finished")
 	end
 end
