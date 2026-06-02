@@ -9,17 +9,24 @@ This extension provides a Poki SDK integration for Defold. [Poki](https://poki.c
 
 ![Poki.com landing page](poki.png)
 
-# Installation
+
+## Best practices
+
+Before you dive in and start integrating the Poki SDK in your game it is recommended that you learn about some of the [best practices when building for the web](best-practices).
+
+
+## Getting started
+
+### Step 1 - Installation
+
 To use Poki SDK in your Defold project, add a version of the Poki SDK extension to your `game.project` dependencies from the list of available [Releases](https://github.com/defold/extension-poki-sdk/releases). Find the version you want, copy the URL to ZIP archive of the release and add it to the project dependencies.
 
 ![](add-dependency.png)
 
 Select `Project->Fetch Libraries` once you have added the version to `game.project` to download the version and make it available in your project.
 
-# Usage
 
-
-## Implement the gameplay events
+### Step 2 - Implement the gameplay events
 
 Use the `poki_sdk.gameplay_start()` event to describe when users are playing your game (e.g. on first user interaction and unpause).
 
@@ -34,9 +41,7 @@ poki_sdk.gameplay_stop()
 -- game over screen pops up
 ```
 
-
-
-## Implement commercial breaks
+### Step 3 - Implement commercial breaks
 
 Commercial breaks are used to display video ads and should be triggered on natural breaks in your game. Throughout the rest of your game, we recommend you implement the `poki_sdk.commercial_break()` before every `poki_sdk.gameplay_start()`, i.e. whenever the user has shown an intent to continue playing.
 
@@ -51,12 +56,13 @@ poki_sdk.commercial_break(function(self, status)
 end)
 ```
 
-### Important information about commercial breaks
-
+::: important
 Not every single `poki_sdk.commercial_break()` will trigger an ad. Poki’s system will determine when a user is ready for another ad, so feel free to signal as many commercial break opportunities as possible.
+:::
 
 
-## Implement rewarded breaks
+### Step 4 - Implement rewarded breaks
+
 Rewarded breaks allow for a user to choose to watch a rewarded video ad in exchange for a certain benefit in the game (e.g. more coins, etc.). When using `poki_sdk.rewarded_break()`, please make it clear to the player beforehand that they’re about to watch an ad.
 
 ```lua
@@ -72,14 +78,14 @@ poki_sdk.rewarded_break(function(self, status)
 end)
 ```
 
-### About the rewarded break timer
+Learn more about rewarded ads in the [Poki monetization guide](https://developers.poki.com/guide/monetization).
 
+::: sidenote
 Calling `poki_sdk.rewarded_break()` affects the timing of `poki_sdk.commercial_break()` - When a user interacts with a rewarded break, our system’s ad timer is reset to ensure the user does not immediately see another ad.
+:::
 
 
-## Final steps
-
-### Pause game and disable input during ads
+### Step 5 - Pause game and disable input during ads
 
 Make sure that the game is paused and keyboard inputs are disabled during `commercial_break` and `rewarded_break`, so that the game doesn’t interfere with the ad:
 
@@ -100,18 +106,22 @@ Beginning with Poki Extension 3.3.0, sound will be muted automatically when ADS 
 
 :::
 
-### Upload and test your game in Poki for Developers
+
+### Step 6 - Upload and test your game in Poki for Developers
 
 Congrats, you’ve successfully implemented the PokiSDK! Now upload your game to the Poki Inspector and test it there. When you’re happy with the implementation, send Poki a review request and they'll play the game. Feel free to contact Poki via Discord or developersupport@poki.com if you’re stuck.
 
 
-## Error handling
+## Advanced topics
+
+### Error handling
 
 Do not collect Lua errors manually using `sys.set_error_handler()`. The SDK collects Lua errors and the engine's errors and warnings automatically.
 
-## Shareable URLs & URL manipulation
 
-### Creating shareable urls and changing the Poki.com url
+### Shareable URLs & URL manipulation
+
+#### Creating shareable urls and changing the Poki.com url
 
 You can create a shareable url with the following function:
 
@@ -130,7 +140,7 @@ end)
 -- read further to see how to fetch these params easily from within your game
 ```
 
-### Reading Poki.com url params
+#### Reading Poki.com url params
 
 As you might have noticed in the previous topic, the `poki_sdk.shareable_url()` creates a url with parameters that are prefixed with gd. We have created a simple helper function that will easily allow you to read the params.
 
@@ -141,6 +151,7 @@ poki_sdk.get_url_param("<param name>")
 local id = poki_sdk.get_url_param("id")
 -- this will return either the gdid param set on poki.com or the id param on the current url
 ```
+
 
 ### Moving the Poki Pill on mobile
 
@@ -163,7 +174,7 @@ The default position is `move_pill(0, 24)`.
 poki_sdk.move_pill(50, -100)
 ```
 
-## User account APIs
+### User account APIs
 
 Most games should call `poki_sdk.get_user()` after load and treat `user == nil` with `error == nil` as "not signed in yet".
 
@@ -184,6 +195,7 @@ end)
 Use `poki_sdk.login()` only in response to a user action that requires an account. A successful login can refresh the page and reload the game, so your game should call `poki_sdk.get_user()` again after load.
 
 `poki_sdk.get_token()` is mainly for games that verify Poki users on their own backend. It returns `token == nil` when no user is logged in and the token is short-lived.
+
 
 ## Example
 
