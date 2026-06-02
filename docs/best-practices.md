@@ -26,7 +26,7 @@ Web players decide very quickly whether they want to stay. The strongest games r
 
 ### The web is a different playground
 
-The web behaves differently from mobile, console, or PC. Players arrive fast, decide fast, and leave fast. At Poki, we see thousands of games enter testing pipelines every year. The games that ultimately succeed are rarely the ones with the largest feature lists or deepest progression systems. Instead, the strongest performers are usually the games that understand web player behavior exceptionally well.
+The web behaves differently from mobile, console, or PC. Players arrive fast, decide fast, and leave fast. At Poki, there are thousands of games enter testing pipelines every year. The games that ultimately succeed are rarely the ones with the largest feature lists or deepest progression systems. Instead, the strongest performers are usually the games that understand web player behavior exceptionally well.
 
 A successful web game creates clarity immediately. It loads quickly, feels responsive within seconds, and gives players something satisfying to do almost instantly. On the web, the game starts the moment the page opens.
 
