@@ -3,8 +3,8 @@ name: Issue Score
 on:
   issues:
     types:
-      - edited
+      - field_added
 
 jobs:
-  build:
+  update-score:
     uses: defold/github-actions-common/.github/workflows/issue-score.yml@master
