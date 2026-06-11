@@ -1,0 +1,10 @@
+name: Issue Score
+
+on:
+  issues:
+    types:
+      - edited
+
+jobs:
+  build:
+    uses: defold/github-actions-common/.github/workflows/issue-score.yml@master
