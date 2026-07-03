@@ -24,13 +24,25 @@ function poki_sdk.gameplay_start() end
 ---Signals that gameplay has stopped.
 function poki_sdk.gameplay_stop() end
  
----Requests a commercial break (ad). The callback is called when the ad finishes.
+---Requests a commercial break (ad). The callback is called when the ad starts and when it finishes.
 ---@param callback fun(self: userdata, status: number) Called with one of the statuses: `poki_sdk.COMMERCIAL_BREAK_START`, `poki_sdk.COMMERCIAL_BREAK_SUCCESS`
 function poki_sdk.commercial_break(callback) end
  
----Requests a rewarded break (rewarded ad). The callback is called when the ad finishes.
----@param size string The size of the reward. Accepted values are `"small"`, `"medium"` and `"large"`. Optional, default is `"small"`.
----@param callback fun(self: userdata, status: number) Called with one of the statuses: `poki_sdk.REWARDED_BREAK_ERROR`, `poki_sdk.REWARDED_BREAK_START`, `poki_sdk.REWARDED_BREAK_SUCCESS`
+---Requests a rewarded break (rewarded ad). The callback is called when the ad starts and when it finishes.
+---@alias PokiRewardSize
+---| '"small"'
+---| '"medium"'
+---| '"large"'
+
+---@alias PokiRewardedBreakStatus
+---| `poki_sdk.REWARDED_BREAK_ERROR`
+---| `poki_sdk.REWARDED_BREAK_START`
+---| `poki_sdk.REWARDED_BREAK_SUCCESS`
+
+---@param size PokiRewardSize The size of the reward. Optional, default is `"small"`.
+---@param callback fun(self: userdata, status: PokiRewardedBreakStatus) Called when the rewarded break starts and when it finishes, with one of the statuses: `poki_sdk.REWARDED_BREAK_ERROR`, `poki_sdk.REWARDED_BREAK_START`, `poki_sdk.REWARDED_BREAK_SUCCESS`.
+---@overload fun(callback: fun(self: userdata, status: PokiRewardedBreakStatus))
+function poki_sdk.rewarded_break(size, callback) end
 function poki_sdk.rewarded_break(size, callback) end
  
 ---Enables or disables debug mode.
@@ -42,13 +54,15 @@ function poki_sdk.set_debug(is_debug) end
 function poki_sdk.capture_error(error) end
  
 ---Generates a shareable URL with the given parameters.
----@param params table
----@param callback function
+---@param params table<string, string|number> URL parameters to include in the generated shareable URL.
+---@param callback fun(self: userdata, url: string) Called with the generated shareable URL.
+function poki_sdk.shareable_url(params, callback) end
 function poki_sdk.shareable_url(params, callback) end
  
 ---Returns the value of a URL query parameter by key.
----@param key string
----@return string value
+---@param key string The query parameter key.
+---@return string|nil value The query parameter value, or `nil` if the parameter was not found.
+
 function poki_sdk.get_url_param(key) end
  
 ---Sends a custom analytics event to Poki.
