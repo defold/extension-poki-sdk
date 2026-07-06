@@ -2,7 +2,7 @@
  
 ---Functions and constants for interacting with Poki SDK APIs
 poki_sdk = {}
- 
+
 ---@type number
 poki_sdk.COMMERCIAL_BREAK_SUCCESS = nil
  
@@ -43,7 +43,6 @@ function poki_sdk.commercial_break(callback) end
 ---@param callback fun(self: userdata, status: PokiRewardedBreakStatus) Called when the rewarded break starts and when it finishes, with one of the statuses: `poki_sdk.REWARDED_BREAK_ERROR`, `poki_sdk.REWARDED_BREAK_START`, `poki_sdk.REWARDED_BREAK_SUCCESS`.
 ---@overload fun(callback: fun(self: userdata, status: PokiRewardedBreakStatus))
 function poki_sdk.rewarded_break(size, callback) end
-function poki_sdk.rewarded_break(size, callback) end
  
 ---Enables or disables debug mode.
 ---@param is_debug boolean
@@ -56,7 +55,6 @@ function poki_sdk.capture_error(error) end
 ---Generates a shareable URL with the given parameters.
 ---@param params table<string, string|number> URL parameters to include in the generated shareable URL.
 ---@param callback fun(self: userdata, url: string) Called with the generated shareable URL.
-function poki_sdk.shareable_url(params, callback) end
 function poki_sdk.shareable_url(params, callback) end
  
 ---Returns the value of a URL query parameter by key.
