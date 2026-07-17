@@ -146,7 +146,8 @@ static dmScript::LuaCallbackInfo* PokiSdk_GetValidCallback(PokiCallbackSlot slot
 
 static void PokiSdk_CommercialBreakCallback(PokiCommercialBreakResult result)
 {
-    dmSound::SetGroupMute(MASTER_SOUND_GROUP, true);
+    bool destroy_callback = (result != COMMERCIAL_BREAK_START);
+    dmSound::SetGroupMute(MASTER_SOUND_GROUP, !destroy_callback);
 
     dmScript::LuaCallbackInfo* callback = PokiSdk_GetValidCallback(CALLBACK_SLOT_COMMERCIAL_BREAK);
     if (callback == 0x0)
@@ -159,16 +160,14 @@ static void PokiSdk_CommercialBreakCallback(PokiCommercialBreakResult result)
 
     if (!dmScript::SetupCallback(callback))
     {
+        if (destroy_callback)
+        {
+            PokiSdk_DestroyCallback(CALLBACK_SLOT_COMMERCIAL_BREAK);
+        }
         return;
     }
 
-    bool destroy_callback = (result != COMMERCIAL_BREAK_START);
     lua_pushnumber(L, result);
-
-    if (destroy_callback)
-    {
-        dmSound::SetGroupMute(MASTER_SOUND_GROUP, false);
-    }
 
     int ret = dmScript::PCall(L, 2, 0);
     (void)ret;
@@ -182,7 +181,8 @@ static void PokiSdk_CommercialBreakCallback(PokiCommercialBreakResult result)
 
 static void PokiSdk_RewardedBreakCallback(PokiRewardedBreakResult result)
 {
-    dmSound::SetGroupMute(MASTER_SOUND_GROUP, true);
+    bool destroy_callback = (result != REWARDED_BREAK_START);
+    dmSound::SetGroupMute(MASTER_SOUND_GROUP, !destroy_callback);
 
     dmScript::LuaCallbackInfo* callback = PokiSdk_GetValidCallback(CALLBACK_SLOT_REWARDED_BREAK);
     if (callback == 0x0)
@@ -195,16 +195,14 @@ static void PokiSdk_RewardedBreakCallback(PokiRewardedBreakResult result)
 
     if (!dmScript::SetupCallback(callback))
     {
+        if (destroy_callback)
+        {
+            PokiSdk_DestroyCallback(CALLBACK_SLOT_REWARDED_BREAK);
+        }
         return;
     }
 
-    bool destroy_callback = (result != REWARDED_BREAK_START);
     lua_pushnumber(L, result);
-
-    if (destroy_callback)
-    {
-        dmSound::SetGroupMute(MASTER_SOUND_GROUP, false);
-    }
 
     int ret = dmScript::PCall(L, 2, 0);
     (void)ret;
@@ -495,7 +493,6 @@ static int PokiSdk_IsAdBlocked(lua_State* L)
 
 static int PokiSdk_ShareableURL(lua_State* L)
 {
-    int type = lua_type(L, 1);
     if (lua_type(L, 1) != LUA_TTABLE)
     {
         luaL_error(L, "Invalid parameters table. Use table with key:value pairs.");
@@ -576,6 +573,7 @@ static int PokiSdk_Login(lua_State* L)
     DM_LUA_STACK_CHECK(L, 0);
     PokiSdk_SetCallback(L, 1, CALLBACK_SLOT_LOGIN, "PokiSDK login callback is invalid. The first argument should be a callback function.");
     PokiSdkJs_Login((LoginSuccessCallback)PokiSdk_LoginCallback, (AsyncErrorCallback)PokiSdk_LoginErrorCallback);
+    return 0;
 }
 
 static int PokiSdk_OpenExternalLink(lua_State* L)
@@ -636,6 +634,11 @@ static dmExtension::Result InitializePokiSdk(dmExtension::Params* params)
 
 static dmExtension::Result FinalizePokiSdk(dmExtension::Params* params)
 {
+    for (int slot = 0; slot < CALLBACK_SLOT_COUNT; ++slot)
+    {
+        PokiSdk_DestroyCallback((PokiCallbackSlot)slot);
+    }
+    dmSound::SetGroupMute(MASTER_SOUND_GROUP, false);
     return dmExtension::RESULT_OK;
 }
 

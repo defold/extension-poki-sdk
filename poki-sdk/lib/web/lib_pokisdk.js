@@ -162,6 +162,9 @@ var LibPokiSdk = {
     PokiSdkJs_GetURLParam: function(key) {
         var key = UTF8ToString(key);
         var value = PokiSDK.getURLParam(key);
+        if (value == null) {
+            return 0;
+        }
         return stringToUTF8OnStack(value);
     },
 
