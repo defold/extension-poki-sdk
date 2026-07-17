@@ -1,146 +1,131 @@
 local dirtylarry = require "dirtylarry/dirtylarry"
 
-local function set_label(node_id, text)
-	gui.set_text(gui.get_node(node_id), text)
+local function set_status(text)
+	print(text)
+	gui.set_text(gui.get_node("status"), text)
+end
+
+local function set_button_label(button_id, text)
+	gui.set_text(gui.get_node(button_id .. "/larrylabel"), text)
 end
 
 local function on_user_ready(self, user, error)
-	local text
 	if error then
-		text = "User error: " .. tostring(error)
+		set_status("User error: " .. tostring(error))
 	elseif user then
-		text = string.format("User: %s\nAvatar: %s", tostring(user.username), tostring(user.avatar_url))
+		set_status("Signed in as " .. tostring(user.username))
 	else
-		text = "User: not logged in"
+		set_status("User: not logged in")
 	end
-
-	print(text)
-	set_label("url", text)
 end
 
 local function on_token_ready(self, token, error)
-	local text
 	if error then
-		text = "Token error: " .. tostring(error)
+		set_status("Token error: " .. tostring(error))
 	elseif token then
-		text = "Token: " .. tostring(token)
+		-- Do not print account tokens. The length is enough to verify the example call.
+		set_status(string.format("Token received (%d characters)", #token))
 	else
-		text = "Token: not available"
+		set_status("Token: not available")
 	end
-
-	print(text)
-	set_label("params", text)
-end
-
-local function request_user_state(self)
-	poki_sdk.get_user(on_user_ready)
-end
-
-local function request_token(self)
-	poki_sdk.get_token(on_token_ready)
 end
 
 local function on_login_finished(self, success, error)
-	local text
 	if success then
-		text = "Login resolved"
-		request_user_state(self)
+		set_status("Login resolved; refreshing user state")
+		poki_sdk.get_user(on_user_ready)
 	else
-		text = "Login error: " .. tostring(error)
+		set_status("Login error: " .. tostring(error))
 	end
-
-	print(text)
-	set_label("success", text)
-end
-
-function init(self)
-	msg.post(".", "acquire_input_focus")
-
-	if html5 then
-		set_label("adblock", "is_ad_blocked: "..tostring(poki_sdk.is_ad_blocked()))
-		set_label("lua-error/larrylabel", "login")
-		set_label("engine-error/larrylabel", "get_token")
-		set_label("success", "Login: -")
-		set_label("url", "User: -")
-		set_label("params", "Token: -")
-		request_user_state(self)
-
-		-- local engine_info = sys.get_engine_info()
-		-- poki_sdk.set_debug(engine_info.is_debug)
-	end
-	sound.play("#sound")
 end
 
 local function on_commercial_break_finished(self, status)
 	if status == poki_sdk.COMMERCIAL_BREAK_START then
-		print("COMMERCIAL_BREAK_START")
-		gui.set_text(gui.get_node("success"), "Commercial started")
+		set_status("Commercial break started")
 	elseif status == poki_sdk.COMMERCIAL_BREAK_SUCCESS then
-		-- continue game
-		print("COMMERCIAL_BREAK_SUCCESS")
-		gui.set_text(gui.get_node("success"), "Commercial finished")
+		set_status("Commercial break finished or skipped")
 	end
 end
 
 local function on_rewarded_break_finished(self, status)
 	if status == poki_sdk.REWARDED_BREAK_ERROR then
-		print("Rewarded break error!")
-		gui.set_text(gui.get_node("success"), "Rewarded error")
+		set_status("Rewarded break failed; no reward")
 	elseif status == poki_sdk.REWARDED_BREAK_START then
-		print("Rewarded break start")
-		gui.set_text(gui.get_node("success"), "Rewarded start")
+		set_status("Rewarded break started")
 	elseif status == poki_sdk.REWARDED_BREAK_SUCCESS then
-		print("Rewarded break success")
-		gui.set_text(gui.get_node("success"), "Rewarded success")
+		set_status("Rewarded break succeeded; grant reward")
 	end
 end
 
 local function on_shareable_url_ready(self, url)
-	print("Sharable url: "..url)
-	gui.set_text(gui.get_node("url"), url)
+	set_status("Shareable URL ready: " .. url)
+end
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	set_button_label("reward_medium", "rewarded medium")
+	set_button_label("get_user", "get_user")
+	set_button_label("open_external_link", "open link")
+
+	if html5 then
+		set_status("Status: wasm-web ready")
+	else
+		set_status("Status: HTML5 / wasm-web build required")
+	end
+
+	sound.play("#sound")
 end
 
 function on_input(self, action_id, action)
-	if html5 then
-		dirtylarry:button("start", action_id, action, function()
-			poki_sdk.gameplay_start()
-		end)
-
-		dirtylarry:button("stop", action_id, action, function()
-			poki_sdk.gameplay_stop()
-		end)
-
-		dirtylarry:button("commercial", action_id, action, function()
-			print("Click Show commercial")
-			poki_sdk.commercial_break(on_commercial_break_finished)
-		end)
-
-		dirtylarry:button("reward", action_id, action, function()
-			print("Click Show reward")
-			poki_sdk.rewarded_break(on_rewarded_break_finished)
-		end)
-
-		dirtylarry:button("shareable_url", action_id, action, function()
-			poki_sdk.shareable_url({param1 = 123, param2 = "str2"}, on_shareable_url_ready)
-		end)
-
-		dirtylarry:button("get_url_param", action_id, action, function()
-			local param1 = poki_sdk.get_url_param("param1")
-			local param2 = poki_sdk.get_url_param("param2")
-			print("param1:"..tostring(param1).."\nparam2:"..tostring(param2))
-			local str = "param1:"..tostring(param1).."\nparam2:"..tostring(param2)
-			gui.set_text(gui.get_node("params"), str)
-		end)
-
-		dirtylarry:button("lua-error", action_id, action, function()
-			print("Click login")
-			poki_sdk.login(on_login_finished)
-		end)
-
-		dirtylarry:button("engine-error", action_id, action, function()
-			print("Click get_token")
-			request_token(self)
-		end)
-		
+	if not html5 then
+		return
 	end
+
+	dirtylarry:button("start", action_id, action, function()
+		poki_sdk.gameplay_start()
+		set_status("gameplay_start sent")
+	end)
+
+	dirtylarry:button("stop", action_id, action, function()
+		poki_sdk.gameplay_stop()
+		set_status("gameplay_stop sent")
+	end)
+
+	dirtylarry:button("commercial", action_id, action, function()
+		poki_sdk.commercial_break(on_commercial_break_finished)
+	end)
+
+	dirtylarry:button("reward", action_id, action, function()
+		poki_sdk.rewarded_break(on_rewarded_break_finished)
+	end)
+
+	dirtylarry:button("reward_medium", action_id, action, function()
+		poki_sdk.rewarded_break("medium", on_rewarded_break_finished)
+	end)
+
+	dirtylarry:button("shareable_url", action_id, action, function()
+		poki_sdk.shareable_url({ level = 3, mode = "demo" }, on_shareable_url_ready)
+	end)
+
+	dirtylarry:button("get_url_param", action_id, action, function()
+		local level = poki_sdk.get_url_param("level")
+		set_status("URL parameter 'level': " .. tostring(level))
+	end)
+
+	dirtylarry:button("get_user", action_id, action, function()
+		poki_sdk.get_user(on_user_ready)
+	end)
+
+	dirtylarry:button("login", action_id, action, function()
+		poki_sdk.login(on_login_finished)
+	end)
+
+	dirtylarry:button("get_token", action_id, action, function()
+		poki_sdk.get_token(on_token_ready)
+	end)
+
+	dirtylarry:button("open_external_link", action_id, action, function()
+		poki_sdk.open_external_link("https://developers.poki.com/")
+		set_status("Opened Poki for Developers")
+	end)
 end
