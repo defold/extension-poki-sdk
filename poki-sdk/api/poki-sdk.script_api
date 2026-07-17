@@ -8,16 +8,19 @@
 
   - name: gameplay_start
     type: function
+    desc: Signals that gameplay has started.
 
 #*****************************************************************************************************
 
   - name: gameplay_stop
     type: function
+    desc: Signals that gameplay has stopped.
 
 #*****************************************************************************************************
 
   - name: commercial_break
     type: function
+    desc: Requests a commercial break. The callback runs when the ad starts and when it finishes.
 
     parameters:
     - name: callback
@@ -38,11 +41,12 @@
 
   - name: rewarded_break
     type: function
+    desc: Requests a rewarded break. The size argument is optional and defaults to small.
 
     parameters:
     - name: size
       type: string
-      desc: The size of the reward. Accepted values are small, medium and large. Optional. Default is small.
+      desc: Optional reward size. Accepted values are small, medium, and large. Defaults to small.
 
     - name: callback
       type: function
@@ -63,6 +67,7 @@
 
   - name: set_debug
     type: function
+    desc: Enables or disables Poki SDK debug mode.
 
     parameters:
     - name: is_debug
@@ -72,6 +77,7 @@
 
   - name: capture_error
     type: function
+    desc: Captures and reports an error to Poki.
 
     parameters:
     - name: error
@@ -79,57 +85,85 @@
       
 #*****************************************************************************************************
 
+  - name: is_ad_blocked
+    type: function
+    desc: "Deprecated: Poki no longer exposes ad-block detection. This compatibility function always returns false."
+    returns:
+    - name: is_ad_blocked
+      type: boolean
+      desc: Always false.
+
+#*****************************************************************************************************
+
   - name: shareable_url
     type: function
+    desc: Generates a shareable URL with the supplied parameters.
 
     parameters:
     - name: params
       type: table
+      desc: String or number values to include in the generated URL.
     
     - name: callback
       type: function
+      parameters:
+        - name: self
+          type: object
+          desc: The calling script instance
+        - name: url
+          type: string
+          desc: The generated shareable URL.
       
 #*****************************************************************************************************
 
   - name: get_url_param
     type: function
+    desc: Returns the value of a URL query parameter.
     
     parameters:
     - name: key
       type: string
     
-    return:
+    returns:
     - name: value
-      type: string|nil
+      type: [string, nil]
+      desc: The parameter value, or nil if it was not found.
 
 #*****************************************************************************************************
 
   - name: measure
     type: function
+    desc: Sends a custom analytics event to Poki.
 
     parameters:
     - name: category
       type: string
     - name: what
       type: string
+      desc: Optional event subject. Defaults to an empty string.
     - name: action
       type: string
+      desc: Optional event action. Defaults to an empty string.
 
 #*****************************************************************************************************
 
   - name: move_pill
     type: function
+    desc: Moves the Poki pill to a different vertical position.
 
     parameters:
     - name: topPercent
       type: number
+      desc: Position from the top in percent.
     - name: topPx
       type: number
+      desc: Additional position offset in pixels.
 
 #*****************************************************************************************************
 
   - name: get_user
     type: function
+    desc: Retrieves the currently logged-in Poki user.
 
     parameters:
     - name: callback
@@ -140,16 +174,17 @@
           type: object
           desc: The calling script instance
         - name: user
-          type: table
-          desc: A table with the fields `username` and `avatar_url`, or `nil` if no user is logged in.
+          type: [table, nil]
+          desc: A table with username and avatar_url, or nil if no user is logged in.
         - name: error
-          type: string
-          desc: The rejection message if user accounts are unavailable, or `nil` otherwise.
+          type: [string, nil]
+          desc: The rejection message, or nil if the request completed normally.
 
 #*****************************************************************************************************
 
   - name: get_token
     type: function
+    desc: Retrieves the Poki auth token for the currently logged-in user.
 
     parameters:
     - name: callback
@@ -160,16 +195,17 @@
           type: object
           desc: The calling script instance
         - name: token
-          type: string
-          desc: The Poki auth token, or `nil` if no user is logged in.
+          type: [string, nil]
+          desc: The short-lived Poki auth token, or nil if no user is logged in.
         - name: error
-          type: string
-          desc: The rejection message if user accounts are unavailable, or `nil` otherwise.
+          type: [string, nil]
+          desc: The rejection message, or nil if the request completed normally.
 
 #*****************************************************************************************************
 
   - name: login
     type: function
+    desc: Prompts the player to log in to their Poki account.
 
     parameters:
     - name: callback
@@ -183,13 +219,14 @@
           type: boolean
           desc: "`true` if the login promise resolved, otherwise `false`."
         - name: error
-          type: string
-          desc: The rejection message on failure, or `nil` on success.
+          type: [string, nil]
+          desc: The rejection message on failure, or nil on success.
 
 #*****************************************************************************************************
   
   - name: open_external_link
     type: function
+    desc: Opens an external link in a new browser tab.
 
     parameters:
     - name: url
@@ -199,16 +236,21 @@
 
   - name: COMMERCIAL_BREAK_SUCCESS
     type: number
+    desc: A commercial break finished or did not display.
   - name: COMMERCIAL_BREAK_START
     type: number
+    desc: A commercial break started.
 
 #*****************************************************************************************************
 
   - name: REWARDED_BREAK_ERROR
     type: number
+    desc: A rewarded break failed or the reward should not be granted.
   - name: REWARDED_BREAK_SUCCESS
     type: number
+    desc: A rewarded break completed and the reward may be granted.
   - name: REWARDED_BREAK_START
     type: number
+    desc: A rewarded break started.
 
 #*****************************************************************************************************

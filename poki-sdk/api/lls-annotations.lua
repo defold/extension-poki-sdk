@@ -13,14 +13,17 @@ poki_sdk.REWARDED_BREAK_ERROR = nil
 poki_sdk.REWARDED_BREAK_SUCCESS = nil
 ---@type number
 poki_sdk.REWARDED_BREAK_START = nil
+---@alias PokiCommercialBreakStatus
+---| `poki_sdk.COMMERCIAL_BREAK_START`
+---| `poki_sdk.COMMERCIAL_BREAK_SUCCESS`
 ---Signals that gameplay has started.
 function poki_sdk.gameplay_start() end
 ---Signals that gameplay has stopped.
 function poki_sdk.gameplay_stop() end
----Requests a commercial break (ad). The callback is called when the ad starts and when it finishes.
----@param callback fun(self: userdata, status: number) Called with one of the statuses: `poki_sdk.COMMERCIAL_BREAK_START`, `poki_sdk.COMMERCIAL_BREAK_SUCCESS`
+---Requests a commercial break. The callback is called when the ad starts and when it finishes.
+---@param callback fun(self: userdata, status: PokiCommercialBreakStatus)
 function poki_sdk.commercial_break(callback) end
----Requests a rewarded break (rewarded ad). The callback is called when the ad starts and when it finishes.
+---Requests a rewarded break. The callback is called when the ad starts and when it finishes.
 ---@alias PokiRewardSize
 ---| '"small"'
 ---| '"medium"'
@@ -31,8 +34,8 @@ function poki_sdk.commercial_break(callback) end
 ---| `poki_sdk.REWARDED_BREAK_START`
 ---| `poki_sdk.REWARDED_BREAK_SUCCESS`
 
----@param size PokiRewardSize The size of the reward. Optional, default is `"small"`.
----@param callback fun(self: userdata, status: PokiRewardedBreakStatus) Called when the rewarded break starts and when it finishes, with one of the statuses: `poki_sdk.REWARDED_BREAK_ERROR`, `poki_sdk.REWARDED_BREAK_START`, `poki_sdk.REWARDED_BREAK_SUCCESS`.
+---@param size PokiRewardSize Optional reward size. Defaults to `"small"`.
+---@param callback fun(self: userdata, status: PokiRewardedBreakStatus)
 ---@overload fun(callback: fun(self: userdata, status: PokiRewardedBreakStatus))
 function poki_sdk.rewarded_break(size, callback) end
  
@@ -42,6 +45,10 @@ function poki_sdk.set_debug(is_debug) end
 ---Captures and reports an error to Poki.
 ---@param error string
 function poki_sdk.capture_error(error) end
+---Returns `false`. This compatibility API is deprecated by Poki.
+---@deprecated Poki no longer exposes ad-block detection. Do not use this for game logic.
+---@return boolean is_ad_blocked Always `false`.
+function poki_sdk.is_ad_blocked() end
 ---Generates a shareable URL with the given parameters.
 ---@param params table<string, string|number> URL parameters to include in the generated shareable URL.
 ---@param callback fun(self: userdata, url: string) Called with the generated shareable URL.
@@ -53,8 +60,8 @@ function poki_sdk.shareable_url(params, callback) end
 function poki_sdk.get_url_param(key) end
 ---Sends a custom analytics event to Poki.
 ---@param category string
----@param what string
----@param action string
+---@param what? string Optional event subject. Defaults to an empty string.
+---@param action? string Optional event action. Defaults to an empty string.
 function poki_sdk.measure(category, what, action) end
 ---Moves the Poki pill (branding element) to a different position.
 ---@param topPercent number Position from the top in percent.
@@ -62,13 +69,13 @@ function poki_sdk.measure(category, what, action) end
 function poki_sdk.move_pill(topPercent, topPx) end
  
 ---Retrieves the currently logged-in Poki user.
----@param callback fun(self: userdata, user: {username: string, avatar_url: string}|nil, error: string|nil) `user` is a table with `username` and `avatar_url`, or `nil` if no user is logged in. `error` is the rejection message if user accounts are unavailable, or `nil` otherwise.
+---@param callback fun(self: userdata, user: {username: string, avatar_url: string}|nil, error: string|nil)
 function poki_sdk.get_user(callback) end
 ---Retrieves the Poki auth token for the currently logged-in user.
----@param callback fun(self: userdata, token: string|nil, error: string|nil) `token` is the Poki auth token, or `nil` if no user is logged in. `error` is the rejection message if user accounts are unavailable, or `nil` otherwise.
+---@param callback fun(self: userdata, token: string|nil, error: string|nil)
 function poki_sdk.get_token(callback) end
 ---Prompts the user to log in to their Poki account.
----@param callback fun(self: userdata, success: boolean, error: string|nil) `success` is `true` if the login promise resolved, otherwise `false`. `error` is the rejection message on failure, or `nil` on success.
+---@param callback fun(self: userdata, success: boolean, error: string|nil)
 function poki_sdk.login(callback) end
 ---Opens an external link in a new browser tab.
 ---@param url string
