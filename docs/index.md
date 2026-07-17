@@ -1,6 +1,6 @@
 ---
 title: Defold Poki SDK extension API documentation
-brief: This manual covers how to integrate and use the Poki SDK in in Defold.
+brief: This manual covers how to integrate and use the Poki SDK in Defold.
 ---
 
 # Defold Poki SDK extension API documentation
@@ -9,6 +9,9 @@ This extension provides a Poki SDK integration for Defold. [Poki](https://poki.c
 
 ![Poki.com landing page](poki.png)
 
+::: important
+This release requires Defold 1.13.0 or newer and targets HTML5 using `wasm-web` only. Defold 1.13.0 removed `js-web`; legacy asm.js builds are not supported.
+:::
 
 ## Best practices
 
@@ -25,6 +28,16 @@ To use Poki SDK in your Defold project, add a version of the Poki SDK extension 
 
 Select `Project->Fetch Libraries` once you have added the version to `game.project` to download the version and make it available in your project.
 
+![](fetch_libraries.png)
+
+### Poki editor commands
+
+The extension adds two commands to the Defold editor:
+
+- **Project → Build Poki HTML5** builds and serves a debug `wasm-web` bundle, then opens it in the Poki Inspector.
+![build_poki_html5](build_poki_html5.png)
+- **Project → Bundle → Poki** creates a release-ready `wasm-web` bundle, writes `poki.zip`, and opens the Poki upload flow.
+![bundle_poki](bundle_poki.png)
 
 ### Step 2 - Implement the gameplay events
 
@@ -78,6 +91,16 @@ poki_sdk.rewarded_break(function(self, status)
 end)
 ```
 
+You can also request a reward size of `"small"`, `"medium"`, or `"large"`. Omitting it defaults to `"small"`:
+
+```lua
+poki_sdk.rewarded_break("medium", function(self, status)
+  if status == poki_sdk.REWARDED_BREAK_SUCCESS then
+    print("Grant the medium reward")
+  end
+end)
+```
+
 Learn more about rewarded ads in the [Poki monetization guide](https://developers.poki.com/guide/monetization).
 
 ::: sidenote
@@ -113,6 +136,24 @@ Congrats, you’ve successfully implemented the PokiSDK! Now upload your game to
 
 
 ## Advanced topics
+
+### Safe calls in non-HTML5 builds
+
+The Lua module is available only in HTML5 builds. Use a small wrapper when your project is also run from the desktop editor or bundled for a native platform:
+
+```lua
+local function with_poki(callback)
+  if html5 and poki_sdk then
+    return callback(poki_sdk)
+  end
+
+  print("Poki SDK call skipped: use an HTML5 wasm-web build")
+end
+
+with_poki(function(poki)
+  poki.gameplay_start()
+end)
+```
 
 ### Error handling
 
@@ -196,10 +237,23 @@ Use `poki_sdk.login()` only in response to a user action that requires an accoun
 
 `poki_sdk.get_token()` is mainly for games that verify Poki users on their own backend. It returns `token == nil` when no user is logged in and the token is short-lived.
 
+Never print or display an account token in a production game. The example reports only whether a token was received and its length.
+
+
+### Opening external links
+
+Use Poki's link helper for user-initiated navigation instead of calling browser APIs directly:
+
+```lua
+poki_sdk.open_external_link("https://developers.poki.com/")
+```
+
 
 ## Example
 
 [Refer to the example project](https://github.com/defold/extension-poki-sdk/blob/main/example/poki-sdk.gui_script) to see a complete example of how the integration works.
+
+![poki-example](poki-example.png)
 
 
 ## Source code
@@ -216,6 +270,7 @@ poki_sdk.gameplay_start() -- in JS it's PokiSDK.gameplayStart()
 poki_sdk.gameplay_stop() -- in JS it's PokiSDK.gameplayStop()
 poki_sdk.commercial_break(function(self, status)end) -- in JS it's PokiSDK.commercialBreak()
 poki_sdk.rewarded_break(function(self, status)end) -- in JS it's PokiSDK.rewardedBreak()
+poki_sdk.rewarded_break(size, function(self, status)end) -- optional `size`: "small", "medium", or "large"
 poki_sdk.set_debug(value) -- in JS it's PokiSDK.setDebug(value)
 poki_sdk.capture_error(error_string) -- in JS it's PokiSDK.captureError(error_string)
 poki_sdk.shareable_url(params, callback) -- in JS it's PokiSDK.shareableURL({}).then(url => {})
