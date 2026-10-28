@@ -381,6 +381,10 @@ poki_sdk.open_external_link("https://developers.poki.com/")
 
 [Refer to the example project](https://github.com/defold/extension-poki-sdk/blob/main/example/poki-sdk.gui_script) to see a complete example of how the integration works.
 
+## Sample Game
+
+[Defold Sample Poki Game](https://github.com/defold/sample-poki) is a complete, playable 3D space shooter called Starbreaker that serves as a starting point for building games for Poki. It demonstrates Poki SDK integration, commercial and rewarded ads, pause and focus handling, audio, saves, input across desktop and mobile devices, and Live Update. The project also includes in-game Poki Dev Tips with practical guidance for developing and testing web games for Poki.
+
 ## Source code
 
 The source code is available on [GitHub](https://github.com/defold/extension-poki-sdk)
