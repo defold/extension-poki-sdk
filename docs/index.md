@@ -15,7 +15,7 @@ Defold 1.13.0 and newer versions use `wasm-web` only. Defold 1.13.0 removed `js-
 
 ## Best practices
 
-Before you dive in and start integrating the Poki SDK in your game, it is recommended to learn some of the [best practices when building for the web](best-practices) that you can check below. We created also the sample game for Poki aimed for showcasing some of these good rules in practice.
+Before you dive in and start integrating the Poki SDK in your game, it is recommended to learn some of the [best practices when building for the web](best-practices) that you can check below. We also created a sample game for Poki to demonstrate these best practices.
 
 ## Sample Game
 
@@ -26,17 +26,17 @@ Open the guide with the Poki button or **P** while playing to see tips for the c
 
 ### Onboarding players
 
-Bring new players into a part of game that is instantly playable and fun with a clear goal and a visual control hint to get their attention as fast as possible. Introduce additional controls only if they are needed, preferably gradually. Keep the first phase of the game easy to learn, and show instructions for the current input method. Test the game's first introductory part on a phone and on desktop with a keyboard and mouse.
+Bring new players into a part of the game that is instantly playable and fun with a clear goal and a visual control hint to get their attention as fast as possible. Introduce additional controls only if they are needed, preferably gradually. Keep the first phase of the game easy to learn, and show instructions for the current input method. Test the game's first introductory part on a phone and on a desktop computer with a keyboard and mouse.
 
-Keep the text as minimal as possible. It's always better to show than to tell, especially when it comes to explaining the game's mechanics. So as far as it's possible for your kind of game - reduce the amount of tutorial popups to minimum and keep the tutorial as part of the introductory gameplay session to keep players interested. For controls - you can show icons or images representing the action and key/button/input visualisation graphics corresponding to them. Images, icons and pictograms are universal.
+Keep text to a minimum. It's always better to show than to tell, especially when it comes to explaining the game's mechanics. As far as possible for your kind of game, reduce the number of tutorial pop-ups to a minimum and keep the tutorial as part of the introductory gameplay session to keep players interested. For controls, show icons or images representing each action and its corresponding key, button, or gesture. Images, icons and pictograms are universal.
 
 #### Localization
 
-For all needed texts and instructions try to provide localization in as many languages as possible. Poki players are from different countries and some people may not understand the texts, so it's important to keep the game readable and understandable even without understanding the texts. For languages that require specific new fonts - load the resources for them asynchronously when needed using Defold's [Live Update](https://defold.com/manuals/live-update/).
+Localize all required text and instructions into as many languages as possible. Poki players are from different countries and some people may not understand the text, so it's important to keep the game readable and understandable even without understanding the text. For languages that require specific new fonts, load the resources for them asynchronously when needed using Defold's [Live Update](https://defold.com/manuals/live-update/).
 
 #### Initial download size and loading screen
 
-From the few seconds you have to get player's interest - you spend some of this time in loading screen. Measure loading with the browser cache disabled and try to reduce the game's size and thus loading screen to minimum. Keep the assets needed for the first interaction in the initial download only and consider Live Update for later content, that is not needed for the first introductory part of the game, with a retry or fallback if a download of deferred assets fails. It is good to put in Live Update packages stuff like audio files, fonts or textures and models not needed initially. Deferring downloading of later stages of the game might also be a good idea.
+You have only a few seconds to capture a player’s interest, and loading takes up part of that time. Measure loading with the browser cache disabled and try to reduce the game's size and thus loading time to a minimum. Include only the assets needed for the first interaction in the initial download. Consider Live Update for later content that is not needed for the first introductory part of the game, with a retry or fallback if a download of deferred assets fails. It is good to put in Live Update packages stuff like audio files, fonts or textures and models not needed initially. Deferring downloading of later stages of the game might also be a good idea.
 
 #### Poki Events
 
@@ -44,11 +44,11 @@ Send `poki_sdk.gameplay_start()` on the first meaningful input that begins actua
 
 ### Retention loops
 
-Give useful result feedback to your players on what happened, whether they win or loose. Make the path from a completed or failed attempt to the next attempt clear, so `Continue` or `Retry` as the primary action, especially when supporting buttons or keys on keyboard for the button, and make it well visible for clicking/taping the button on screen. Let players quickly retry and apply what they learned. Introduce reachable goals and upgrades without making players navigate several menus between attempts.
+Give useful result feedback to your players on what happened, whether they win or lose. Make `Continue` or `Retry` the primary action, with a clearly visible button that is easy to click or tap and supports keyboard or gamepad input where appropriate. Let players quickly retry and apply what they learned. Introduce reachable goals and upgrades without making players navigate several menus between attempts.
 
 #### Progress
 
-Save progress, settings, and completed tutorial steps, but even if browser storage is unavailable, still keep the current session playable. Test both a fresh visit (you can test so in Incognito Mode in your browser) and a return visit - returning players should keep their progress and avoid repeating onboarding they completed already. Sometimes players though skips the tutorials, so make crucial information available somewhere, e.g. in Pause or Settings screen. At least keeping the main controls there is a good idea.
+Save progress, settings, and completed tutorial steps, but even if browser storage is unavailable, still keep the current session playable. Test both a fresh visit (you can test this in Incognito Mode in your browser) and a return visit - returning players should keep their progress and avoid repeating onboarding they have already completed. Some players skip tutorials, so make crucial information available elsewhere, such as on the Pause or Settings screen. At least keeping the main controls there is a good idea.
 
 #### Engagement tracking
 
@@ -56,9 +56,9 @@ Track attempts with the progress events. Compare where players stop with playtes
 
 ### Monetization placement
 
-Choose such an ad placement opportunities so that they become part of the intuitive game flow. A commercial break is usually put during an intentional return to gameplay after a natural stop, e.g. completing the level, achieving some progress, etc.
+Choose ad placements that fit naturally into the game flow. A commercial break usually occurs during an intentional return to gameplay after a natural stop, e.g. completing the level, achieving some progress, etc.
 
-Rewarded offers should be well described or presented and give players in return a useful, preferably optional benefit, such as a revive or a cosmetic unlock, but also keep the standard action to continue playing the game clear and available. See Step 4 below for more details.
+Rewarded offers should be well described or presented and give players in return a useful, preferably optional benefit, such as a revive or a cosmetic unlock. Keep the standard action for continuing the game clear and available. See Step 4 below for more details.
 
 Review the [Poki monetization tips](https://developers.poki.com/guide/monetization) and [ad integration requirements](https://developers.poki.com/guide/requirements-quality#advertisement-integration) before designing offer buttons. Follow Steps 3-5 below for callback handling, input, and pause behavior.
 
@@ -199,7 +199,7 @@ Calling `poki_sdk.rewarded_break()` affects the timing of `poki_sdk.commercial_b
 
 Make sure that the game is paused and controls are disabled during `commercial_break` and `rewarded_break`, so that the game doesn’t interfere with the ad. Block keyboard, mouse, touch, and gamepad input throughout the request, and use one shared pending state to prevent commercial and rewarded requests from overlapping. Do not wait for a `*_BREAK_START` status to lock the UI.
 
-Do not send gameplay or `measure()` events while an ad is playing. Clear the pending state and restore to the appropriate screen on every final status. Resume gameplay only if the player is returning to the game directly, though it is recommended to return to a paused mode or some kind of other popup/screen, where player has to make a first meaningful input to return back to the game, so for example unlocking a skin from a menu does not require a new gameplay start, but if you are watching and ad in the middle of the game, this might be required. Make sure to keep the script owning the callback alive until the request finishes.
+Do not send gameplay or `measure()` events while an ad is playing. On every final status, clear the pending state and return to the appropriate screen. Resume gameplay only if the player is returning directly to the game. Preferably, return to a paused state or another screen that requires meaningful player input before gameplay resumes. For example, unlocking a skin from a menu does not require a new gameplay-start event, but resuming gameplay after an ad may require one. Keep the script that owns the callback alive until the request finishes.
 
 ```lua
 -- In the rewarded offer handler, after stopping any active gameplay:
