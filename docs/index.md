@@ -15,7 +15,52 @@ Defold 1.13.0 and newer versions use `wasm-web` only. Defold 1.13.0 removed `js-
 
 ## Best practices
 
-Before you dive in and start integrating the Poki SDK in your game it is recommended that you learn about some of the [best practices when building for the web](best-practices).
+Before you dive in and start integrating the Poki SDK in your game, it is recommended to learn some of the [best practices when building for the web](best-practices) that you can check below. We also created a sample game for Poki to demonstrate these best practices.
+
+## Sample Game
+
+[Defold Sample Poki Game](https://github.com/defold/sample-poki) is a complete, playable 3D space shooter called Starbreaker that serves as a starting point for building games for Poki. It demonstrates Poki SDK integration, commercial and rewarded ads, pause and focus handling, audio, saves, input across desktop and mobile devices, and Live Update. The project also includes in-game Poki Dev Tips with practical guidance for developing and testing web games for Poki.
+
+Open the guide with the Poki button or **P** while playing to see tips for the current screen. Read the [tip collection](https://github.com/defold/sample-poki/blob/master/learn/tips.lua) alongside the sample implementation. Some tips refer to the sample's service wrappers; use the public extension calls and callback constants below when integrating the SDK directly.
+
+
+### Onboarding players
+
+Bring new players into a part of the game that is instantly playable and fun with a clear goal and a visual control hint to get their attention as fast as possible. Introduce additional controls only if they are needed, preferably gradually. Keep the first phase of the game easy to learn, and show instructions for the current input method. Test the game's first introductory part on a phone and on a desktop computer with a keyboard and mouse.
+
+Keep text to a minimum. It's always better to show than to tell, especially when it comes to explaining the game's mechanics. As far as possible for your kind of game, reduce the number of tutorial pop-ups to a minimum and keep the tutorial as part of the introductory gameplay session to keep players interested. For controls, show icons or images representing each action and its corresponding key, button, or gesture. Images, icons and pictograms are universal.
+
+#### Localization
+
+Localize all required text and instructions into as many languages as possible. Poki players are from different countries and some people may not understand the text, so it's important to keep the game readable and understandable even without understanding the text. For languages that require specific new fonts, load the resources for them asynchronously when needed using Defold's [Live Update](https://defold.com/manuals/live-update/).
+
+#### Initial download size and loading screen
+
+You have only a few seconds to capture a player’s interest, and loading takes up part of that time. Measure loading with the browser cache disabled and try to reduce the game's size and thus loading time to a minimum. Include only the assets needed for the first interaction in the initial download. Consider Live Update for later content that is not needed for the first introductory part of the game, with a retry or fallback if a download of deferred assets fails. It is good to put in Live Update packages stuff like audio files, fonts or textures and models not needed initially. Deferring downloading of later stages of the game might also be a good idea.
+
+#### Poki Events
+
+Send `poki_sdk.gameplay_start()` on the first meaningful input that begins actual gameplay, rather than during initialization or when displaying instructions and still not being "in the game", as sometimes your game might start in a paused mode. See [Poki's onboarding guide](https://developers.poki.com/guide/easy-access) for more design guidance.
+
+### Retention loops
+
+Give useful result feedback to your players on what happened, whether they win or lose. Make `Continue` or `Retry` the primary action, with a clearly visible button that is easy to click or tap and supports keyboard or gamepad input where appropriate. Let players quickly retry and apply what they learned. Introduce reachable goals and upgrades without making players navigate several menus between attempts.
+
+#### Progress
+
+Save progress, settings, and completed tutorial steps, but even if browser storage is unavailable, still keep the current session playable. Test both a fresh visit (you can test this in Incognito Mode in your browser) and a return visit - returning players should keep their progress and avoid repeating onboarding they have already completed. Some players skip tutorials, so make crucial information available elsewhere, such as on the Pause or Settings screen. At least keeping the main controls there is a good idea.
+
+#### Engagement tracking
+
+Track attempts with the progress events. Compare where players stop with playtest recordings before adding more content or changing difficulty. See [Poki's engagement guide](https://developers.poki.com/guide/engagement) for more details.
+
+### Monetization placement
+
+Choose ad placements that fit naturally into the game flow. A commercial break usually occurs during an intentional return to gameplay after a natural stop, e.g. completing the level, achieving some progress, etc.
+
+Rewarded offers should be well described or presented and give players in return a useful, preferably optional benefit, such as a revive or a cosmetic unlock. Keep the standard action for continuing the game clear and available. See Step 4 below for more details.
+
+Review the [Poki monetization tips](https://developers.poki.com/guide/monetization) and [ad integration requirements](https://developers.poki.com/guide/requirements-quality#advertisement-integration) before designing offer buttons. Follow Steps 3-5 below for callback handling, input, and pause behavior.
 
 
 ## Getting started
@@ -68,9 +113,11 @@ Use Scaling Tests to try different resolutions, aspect ratios, and mobile-device
 
 ### Step 2 - Implement the gameplay events
 
-Use the `poki_sdk.gameplay_start()` event to describe when users are playing your game (e.g. on first user interaction and unpause).
+Use the `poki_sdk.gameplay_start()` event to describe when users are playing your game (e.g. on first user interaction and unpause), so when the player's first input begins gameplay, and whenever active gameplay resumes after an interruption. Do not send it on load or simply because a menu (pause) is closed.
 
-Use the `poki_sdk.gameplay_stop()` event to describe when users aren’t playing your game (e.g. level finish, game over, pause, quit to menu).
+Use the `poki_sdk.gameplay_stop()` event when gameplay stops (e.g. level finish, game over, pause, focus loss, quit to menu). Freeze the game world as appropriate for your genre; sending an SDK event does not pause the Defold simulation.
+
+Send events on state transitions, with no two starts or two stops in succession. Menus, result screens, and non-interactive instructions should not count as active play. An interactive tutorial can count as gameplay when the player is actually playing.
 
 ```lua
 -- first level loads, player clicks anywhere
@@ -83,23 +130,28 @@ poki_sdk.gameplay_stop()
 
 ### Step 3 - Implement commercial breaks
 
-Commercial breaks are used to display video ads and should be triggered on natural breaks in your game. Throughout the rest of your game, we recommend you implement the `poki_sdk.commercial_break()` before every `poki_sdk.gameplay_start()`, i.e. whenever the user has shown an intent to continue playing.
+Commercial breaks are opportunities to display video ads when the player chooses Continue, Retry, or Resume after gameplay has stopped. Request the break on the way back into play, rather than when opening a pause menu or displaying a result screen. Skip the first entry into gameplay and return directly from a rewarded break without immediately requesting a commercial break.
+
+The regular sequence is `gameplay_stop()` → player chooses to continue → `commercial_break()` → final callback → resume gameplay and send `gameplay_start()`. You have to keep the gameplay paused until the final callback, even when no ad is displayed. See [Poki's SDK event sequences](https://developers.poki.com/guide/sdk-overview#order-of-events).
 
 The Lua callback represents Poki's `commercialBreak(startCallback).then(...)` flow: it receives `COMMERCIAL_BREAK_START` if Poki invokes the start callback, then `COMMERCIAL_BREAK_SUCCESS` when the promise resolves. A break opportunity does not necessarily display an ad.
 
 ```lua
--- gameplay stops
+-- The player chooses Continue/Retry/Resume after gameplay has stopped.
+-- Keep the world paused and block repeated requests until the final callback.
 poki_sdk.commercial_break(function(self, status)
   if status == poki_sdk.COMMERCIAL_BREAK_START then
-    print("Commercial break started, pause game")
+    print("Commercial break started")
   elseif status == poki_sdk.COMMERCIAL_BREAK_SUCCESS then
     print("Commercial break finished or did not happen")
+    -- Restore input and resume gameplay here.
+    -- Send gameplay_start() when active gameplay actually resumes.
   end
 end)
 ```
 
 ::: important
-Not every single `poki_sdk.commercial_break()` will trigger an ad. Poki’s system will determine when a user is ready for another ad, so feel free to signal as many commercial break opportunities as possible.
+Not every `poki_sdk.commercial_break()` will trigger an ad. Poki’s system will determine when a user is ready for another ad. Thus, you do not need to add an internal ad timer or a minimum level threshold to manage frequency. Feel free to signal eligible opportunities at natural moments and let Poki control ad frequency.
 :::
 
 
@@ -107,7 +159,11 @@ Not every single `poki_sdk.commercial_break()` will trigger an ad. Poki’s syst
 
 Rewarded breaks allow for a user to choose to watch a rewarded video ad in exchange for a certain benefit in the game (e.g. more coins, etc.). When using `poki_sdk.rewarded_break()`, please make it clear to the player beforehand that they’re about to watch an ad.
 
+Show the standard action to continue playing the game (`Continue`/`Retry`) alongside the rewarded option, with at least equal prominence. It's good to keep the standard action as the default for the usual keyboard or gamepad confirmation input (e.g. `Space`), and use a separate intentional action for the rewarded offer. Rewarded buttons must include a prominent video icon and must **not** be green. See the [complete button hierarchy requirements](https://developers.poki.com/guide/requirements-quality#advertisement-integration).
+
 The Lua callback maps Poki's `rewardedBreak({ size, onStart }).then(success => ...)` flow to statuses. It receives `REWARDED_BREAK_START` if Poki invokes `onStart`, followed by `REWARDED_BREAK_SUCCESS` when the promise resolves to `true` or `REWARDED_BREAK_ERROR` when it resolves to `false`.
+
+Grant the advertised reward exactly and only once, on `REWARDED_BREAK_SUCCESS`. On `REWARDED_BREAK_ERROR`, keep the normal way to get back to the gameplay available without granting the reward. Do not use `is_ad_blocked()` to decide whether to grant it, Poki handles it.
 
 ```lua
 -- gameplay stops
@@ -141,15 +197,31 @@ Calling `poki_sdk.rewarded_break()` affects the timing of `poki_sdk.commercial_b
 
 ### Step 5 - Pause game and disable input during ads
 
-Make sure that the game is paused and keyboard inputs are disabled during `commercial_break` and `rewarded_break`, so that the game doesn’t interfere with the ad:
+Make sure that the game is paused and controls are disabled during `commercial_break` and `rewarded_break`, so that the game doesn’t interfere with the ad. Block keyboard, mouse, touch, and gamepad input throughout the request, and use one shared pending state to prevent commercial and rewarded requests from overlapping. Do not wait for a `*_BREAK_START` status to lock the UI.
+
+Do not send gameplay or `measure()` events while an ad is playing. On every final status, clear the pending state and return to the appropriate screen. Resume gameplay only if the player is returning directly to the game. Preferably, return to a paused state or another screen that requires meaningful player input before gameplay resumes. For example, unlocking a skin from a menu does not require a new gameplay-start event, but resuming gameplay after an ad may require one. Keep the script that owns the callback alive until the request finishes.
 
 ```lua
--- gameplay stops
+-- In the rewarded offer handler, after stopping any active gameplay:
+if self.ad_busy then
+  return
+end
+
+ -- Use the same guard for commercial requests:
+self.ad_busy = true
+
+-- Pause the world and block game input here before requesting the ad:
+
 poki_sdk.rewarded_break(function(self, status)
   if status == poki_sdk.REWARDED_BREAK_START then
-    print("Rewarded break start, pause game and disable input")
+    print("Rewarded break started; keep game input blocked")
   elseif status == poki_sdk.REWARDED_BREAK_ERROR or status == poki_sdk.REWARDED_BREAK_SUCCESS then
-    print("Rewarded break finished or did not happen, unpause game and enable input")
+    self.ad_busy = false
+    if status == poki_sdk.REWARDED_BREAK_SUCCESS then
+      -- Grant this request's reward exactly once here.
+    end
+    -- Restore the menu or prepare to resume play, depending on the offer.
+    -- Restore input; send gameplay_start() only when gameplay resumes.
   end
 end)
 ```
@@ -159,6 +231,8 @@ end)
 Beginning with Poki Extension 3.3.0, sound will be muted automatically when ADS are shown.
 
 :::
+
+If you store the player's settings regarding the sound - preserve the sound settings when restoring audio after a break or focus loss. Temporary sound muting during an ad should not change their saved preference.
 
 ### Step 6 - Implement custom events
 
@@ -249,8 +323,23 @@ poki_sdk.measure("difficulty", "hard", "selected")
 
 ### Step 7 - Upload and test your game in Poki for Developers
 
-Congrats, you’ve successfully implemented the Poki SDK! Now upload your game to the Poki Inspector and test it there. When you’re happy with the implementation, send Poki a review request and they'll play the game. Feel free to contact Poki via Discord or developersupport@poki.com if you’re stuck.
+Congrats, you’ve successfully implemented the Poki SDK! Now upload your game to the Poki Inspector and test it there.
 
+Use a fresh save for the first session, then repeat with saved progress. Work through these paths and check the Event Log:
+
+| Player journey | Check |
+| --- | --- |
+| First visit | Loading and control hints work on desktop and a mobile phone. First gameplay starts on player input without a commercial break. Game is started from scratch, progression is cleared. If you have any tutorial, welcome screen, or initial phase - it starts properly on a first visit. |
+| First win or failure | The result explains what happened and next actions are available (`Continue` or `Retry`) and is easy to find and click (and eventually has a keyboard or button assigned). |
+| Pause or switch browser tabs | Gameplay stops once. Returning to a real-time game does not resume into danger without player intent. |
+| Continue, Retry, or Resume | At your designed points where a commercial opportunity is resolved, Poki can show an ad when available. Gameplay starts once when play resumes. |
+| Rewarded offer | The reward matches the offer and is granted once on success. After an unsuccessful request you should still be able to get back to game. |
+| Tap an offer repeatedly | Only one ad request is pending, game input is blocked during the break, and no gameplay or measurement events fire during ad playback. |
+| Reload or disable browser storage | Saved progress and settings restore when available. After storage access failure you are still able to get back to the current session. |
+
+Use [Poki playtests](https://developers.poki.com/guide/playtesting) to watch where new players hesitate or leave, alongside the events from Step 6. When you’re happy with the implementation, upload your game through Poki for Developers and send a review request. Contact Poki via Discord or developersupport@poki.com if you’re stuck.
+
+When you’re happy with the implementation and will pass the required tests, send Poki a review request and they'll play the game. Feel free to contact Poki via Discord or developersupport@poki.com if you’re stuck.
 
 ## Advanced topics
 
@@ -380,10 +469,6 @@ poki_sdk.open_external_link("https://developers.poki.com/")
 ## Example
 
 [Refer to the example project](https://github.com/defold/extension-poki-sdk/blob/main/example/poki-sdk.gui_script) to see a complete example of how the integration works.
-
-## Sample Game
-
-[Defold Sample Poki Game](https://github.com/defold/sample-poki) is a complete, playable 3D space shooter called Starbreaker that serves as a starting point for building games for Poki. It demonstrates Poki SDK integration, commercial and rewarded ads, pause and focus handling, audio, saves, input across desktop and mobile devices, and Live Update. The project also includes in-game Poki Dev Tips with practical guidance for developing and testing web games for Poki.
 
 ## Source code
 
